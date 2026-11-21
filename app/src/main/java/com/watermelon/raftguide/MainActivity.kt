@@ -483,7 +483,7 @@ fun GuideApp(){
  if(chosen==null){
  val list=if(page=="收藏")favoriteItems else filtered
  Text("目前顯示 "+list.size+" 項",color=MaterialTheme.colorScheme.primary)
- LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
  items(list,key={it.name+it.cat}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
@@ -494,7 +494,7 @@ fun GuideApp(){
  }
  }else{
  TextButton(onClick={chosen=null}){Text("← 返回列表")}
- Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
+ Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)){
  Text(chosen!!.icon,style=MaterialTheme.typography.displayMedium)
  Text(chosen!!.name,style=MaterialTheme.typography.headlineMedium,fontWeight=FontWeight.Bold)
@@ -510,7 +510,7 @@ fun GuideApp(){
  }
  }
  }else if(page=="AI問答"){
- Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom=20.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+ Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom=20.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
    Text("🤖 RAFT 專用 AI 助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
    Text("連線式生成 AI，只回答《Raft》遊戲內容；可搜尋遊戲資料並接續追問。",style=MaterialTheme.typography.bodyMedium)
@@ -557,7 +557,7 @@ fun GuideApp(){
   }
  }
  }else if(page=="料理"){
- LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
  items(recipeInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🍲 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="動物"){
@@ -565,12 +565,12 @@ fun GuideApp(){
  items(animalInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🐾 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="藍圖"){
- LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(blueprintInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("📜 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}}
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(blueprintInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("📜 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}}
  }else if(page=="新手指南"){
  val tips=listOf("先維持生存" to "優先收集木板、塑膠與棕櫚葉，準備淨水器與烤架。","擴大木筏" to "在木筏外圍設置收集網，定期整理收集到的物資。","研究材料" to "製作研究桌，投入新材料逐步解鎖製作項目。","探索島嶼" to "靠近島嶼後固定木筏，探索陸地與水下並留意補給。","建立農場" to "使用種植箱種植作物，準備草地區照顧可飼養動物。","尋找故事地點" to "製作接收器與天線，依螢幕訊號探索故事地點。","管理資源" to "將材料分類存放，保留木板作為燃料與修理用途。")
- LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(tips){tip->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp)){Text(tip.first,fontWeight=FontWeight.Bold);Text(tip.second)}}}}
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(tips){tip->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp)){Text(tip.first,fontWeight=FontWeight.Bold);Text(tip.second)}}}}
  }else{
- LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(islands){island->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🏝️ "+island.first,fontWeight=FontWeight.Bold);Text(island.second)}}}}
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(islands){island->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🏝️ "+island.first,fontWeight=FontWeight.Bold);Text(island.second)}}}}
  }
  }
  }
