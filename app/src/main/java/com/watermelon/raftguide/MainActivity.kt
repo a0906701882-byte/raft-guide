@@ -361,7 +361,7 @@ private suspend fun requestRaftAi(endpoint:String, question:String, history:List
   val stream=if(code in 200..299)connection.inputStream else connection.errorStream
   val raw=stream.bufferedReader(Charsets.UTF_8).use{it.readText()}
   val result=JSONObject(raw)
-  if(code !in 200..299) throw IllegalStateException(result.optString("error","AI 服務回應錯誤"))
+  if(code !in 200..299) throw IllegalStateException(buildString{append(result.optString("error","AI 服務回應錯誤"));val detail=result.optString("detail");if(detail.isNotBlank())append("\\n詳細原因：").append(detail)})
   val answer=result.optString("answer","AI 沒有回傳答案")
   val refs=mutableListOf<Pair<String,String>>()
   val arr=result.optJSONArray("sources")?:JSONArray()
