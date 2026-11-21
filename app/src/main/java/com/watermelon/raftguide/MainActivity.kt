@@ -245,14 +245,14 @@ private val islands = listOf(
 "小型島嶼" to "常見植物與海岸資源區。可留意棕櫚樹、作物與周圍淺海資源。",
 "大型島嶼" to "有較多地形與生態區域，可能找到動物、洞穴、埋藏物及多種資源。",
 "稀有島嶼" to "特殊外觀或特殊資源的探索地點，內容可能隨世界生成而異。",
-"無線電塔 Radio Tower" to "第一章故事地點。可找到故事筆記、藍圖與後續頻率線索。",
-"瓦薩加坦 Vasagatan" to "第一章故事地點。以船舶內部探索、筆記與藍圖收集為主。",
-"巴爾博亞島 Balboa Island" to "第一章故事地點。森林環境，包含步道、研究設施與故事線索。",
-"商隊小鎮 Caravan Town" to "第二章故事地點。探索聚落、水下區域與各處線索。",
-"唐加羅瓦 Tangaroa" to "第二章故事地點。大型人工城市區域，包含代幣、筆記與收藏。",
-"瓦魯納角 Varuna Point" to "第三章故事地點。水下建築與多層探索區域，留意筆記及藍圖。",
-"坦佩雷斯 Temperance" to "第三章故事地點。冰雪環境，包含研究設施、交通設施與故事線索。",
-"烏托邦 Utopia" to "第三章最終故事地點。包含多個區域、謎題與故事收尾內容。",
+"無線電塔" to "第一章故事地點。可找到故事筆記、藍圖與後續頻率線索。",
+"瓦薩加坦" to "第一章故事地點。以船舶內部探索、筆記與藍圖收集為主。",
+"巴爾博亞島" to "第一章故事地點。森林環境，包含步道、研究設施與故事線索。",
+"商隊小鎮" to "第二章故事地點。探索聚落、水下區域與各處線索。",
+"唐加羅瓦" to "第二章故事地點。大型人工城市區域，包含代幣、筆記與收藏。",
+"瓦魯納角" to "第三章故事地點。水下建築與多層探索區域，留意筆記及藍圖。",
+"坦佩雷斯" to "第三章故事地點。冰雪環境，包含研究設施、交通設施與故事線索。",
+"烏托邦" to "第三章最終故事地點。包含多個區域、謎題與故事收尾內容。",
 "交易站 Trading Post" to "大型島嶼可能出現的交易設施，可使用交易貨幣兌換商品與特殊食譜。",
 "水下珊瑚礁" to "島嶼周圍的水下探索區域，可找到沙子、黏土、礦石及其他海洋材料。",
 "廢棄木筏" to "海上探索地點之一，可能找到補給與食譜線索。"
@@ -267,60 +267,60 @@ private val animalInfo = listOf(
 "海鷗 Seagull" to "可能停留在鳥巢附近；留意種植區作物的保護。"
 )
 private val blueprintInfo = listOf(
-"Advanced Battery" to "進階電池藍圖：解鎖較高階的電力儲存設備。",
-"Advanced Biofuel Refiner" to "進階生質燃料精煉器藍圖：解鎖燃料加工設備。",
-"Advanced Head Light" to "進階頭燈藍圖：解鎖照明裝備。",
-"Advanced Large Crop Plot" to "進階大型種植箱藍圖：解鎖大型種植設備。",
-"Advanced Medium Crop Plot" to "進階中型種植箱藍圖：解鎖中型種植設備。",
-"Advanced Small Crop Plot" to "進階小型種植箱藍圖：解鎖小型種植設備。",
-"Advanced Stationary Anchor" to "進階固定式錨藍圖：解鎖固定木筏設備。",
-"Antenna" to "天線藍圖：接收器定位系統的組件。",
-"Battery Charger" to "電池充電器藍圖：解鎖電池充電設備。",
-"Big Backpack" to "大型背包藍圖：解鎖容量較大的背包。",
-"Biofuel Refiner" to "生質燃料精煉器藍圖：解鎖燃料加工設備。",
-"Canteen" to "水壺藍圖：解鎖便攜式飲水容器。",
-"Detail Plank" to "細節木板藍圖：解鎖建築外觀細節。",
-"Electric Grill" to "電動烤架藍圖：解鎖電力烹飪設備。",
-"Electric Purifier" to "電動淨水器藍圖：解鎖電力淨水設備。",
-"Electric Smelter" to "電動熔爐藍圖：解鎖電力加工設備。",
-"Electric Zipline Tool" to "電動滑索工具藍圖：解鎖滑索交通裝備。",
-"Engine" to "引擎藍圖：解鎖木筏動力設備。",
-"Engine Controls" to "引擎控制器藍圖：集中控制引擎。",
-"Fuel Pipe" to "燃料管藍圖：解鎖燃料輸送管線。",
-"Fuel Tank" to "燃料槽藍圖：解鎖燃料儲存設備。",
-"Head Light" to "頭燈藍圖：解鎖照明裝備。",
-"Large Storage" to "大型儲物箱藍圖：解鎖大型收納設備。",
-"Metal Detector" to "金屬探測器藍圖：解鎖探索用探測設備。",
-"Receiver" to "接收器藍圖：解鎖故事訊號定位設備。",
-"Recycler" to "回收機藍圖：解鎖資源回收設備。",
-"Steering Wheel" to "方向盤藍圖：解鎖木筏方向控制設備。",
-"Water Pipe" to "水管藍圖：解鎖水路輸送設備。",
-"Water Tank" to "水箱藍圖：解鎖淡水儲存設備。",
-"Wind Turbine" to "風力發電機藍圖：解鎖風力供電設備。",
-"Zipline" to "滑索藍圖：解鎖滑索設施。",
-"Zipline Tool" to "滑索工具藍圖：解鎖滑索移動裝備。"
+"進階電池" to "進階電池藍圖：解鎖較高階的電力儲存設備。",
+"進階生質燃料精煉器" to "進階生質燃料精煉器藍圖：解鎖燃料加工設備。",
+"進階頭燈" to "進階頭燈藍圖：解鎖照明裝備。",
+"進階大型種植箱" to "進階大型種植箱藍圖：解鎖大型種植設備。",
+"進階中型種植箱" to "進階中型種植箱藍圖：解鎖中型種植設備。",
+"進階小型種植箱" to "進階小型種植箱藍圖：解鎖小型種植設備。",
+"進階固定式錨" to "進階固定式錨藍圖：解鎖固定木筏設備。",
+"天線" to "天線藍圖：接收器定位系統的組件。",
+"電池充電器" to "電池充電器藍圖：解鎖電池充電設備。",
+"大型背包" to "大型背包藍圖：解鎖容量較大的背包。",
+"生質燃料精煉器" to "生質燃料精煉器藍圖：解鎖燃料加工設備。",
+"水壺" to "水壺藍圖：解鎖便攜式飲水容器。",
+"細節木板" to "細節木板藍圖：解鎖建築外觀細節。",
+"電動烤架" to "電動烤架藍圖：解鎖電力烹飪設備。",
+"電動淨水器" to "電動淨水器藍圖：解鎖電力淨水設備。",
+"電動熔爐" to "電動熔爐藍圖：解鎖電力加工設備。",
+"電動滑索工具" to "電動滑索工具藍圖：解鎖滑索交通裝備。",
+"引擎" to "引擎藍圖：解鎖木筏動力設備。",
+"引擎控制器" to "引擎控制器藍圖：集中控制引擎。",
+"燃料管" to "燃料管藍圖：解鎖燃料輸送管線。",
+"燃料槽" to "燃料槽藍圖：解鎖燃料儲存設備。",
+"頭燈" to "頭燈藍圖：解鎖照明裝備。",
+"大型儲物箱" to "大型儲物箱藍圖：解鎖大型收納設備。",
+"金屬探測器" to "金屬探測器藍圖：解鎖探索用探測設備。",
+"接收器" to "接收器藍圖：解鎖故事訊號定位設備。",
+"回收機" to "回收機藍圖：解鎖資源回收設備。",
+"方向盤" to "方向盤藍圖：解鎖木筏方向控制設備。",
+"水管" to "水管藍圖：解鎖水路輸送設備。",
+"水箱" to "水箱藍圖：解鎖淡水儲存設備。",
+"風力發電機" to "風力發電機藍圖：解鎖風力供電設備。",
+"滑索" to "滑索藍圖：解鎖滑索設施。",
+"滑索工具" to "滑索工具藍圖：解鎖滑索移動裝備。"
 )
 private val recipeInfo = listOf(
-"BBQ 燒烤拼盤" to "料理鍋食譜。食材與數量請依遊戲內 Recipe: BBQ 卡片確認。",
-"Catfish Deluxe 鯰魚豪華餐" to "料理鍋食譜。高級料理；依食譜卡片準備鯰魚與指定食材。",
-"Coconut Chicken 椰子雞" to "料理鍋食譜。依食譜卡片確認椰子與其他材料份量。",
-"Head Broth 頭骨濃湯" to "料理鍋食譜。依食譜卡片確認指定材料。",
-"Hearty Stew 豐盛燉菜" to "料理鍋食譜。特殊效果料理；依食譜卡片確認材料。",
-"Mushroom Omelette 蘑菇煎蛋" to "料理鍋食譜。依食譜卡片確認蘑菇與其他材料份量。",
-"Salmon Salad 鮭魚沙拉" to "料理鍋食譜。高級料理；依食譜卡片確認材料。",
-"Shark Dinner 鯊魚晚餐" to "料理鍋食譜。依食譜卡片確認材料與份量。",
-"Simple Fish Stew 簡易魚湯" to "料理鍋食譜。依食譜卡片確認可替換食材與份量。",
-"Steak with Jam 果醬牛排" to "料理鍋食譜。依食譜卡片確認材料與份量。",
-"Sushi 壽司" to "料理鍋食譜。依食譜卡片確認材料與份量。",
-"Vegetable Soup 蔬菜湯" to "料理鍋食譜。蔬菜可依食譜卡片允許的組合替換。",
-"Coconut Beat 椰子甜菜飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Mangonana 芒果香蕉汁" to "榨汁機食譜。依食譜卡片確認水果與份量。",
-"Red Melon 紅色西瓜汁" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Redbeet Shot 甜菜根特調" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Silver Smoothie 銀色冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Simple Smoothie 簡易冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Spicy Pineberry 香辣鳳梨莓果飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
-"Strawberry Colada 草莓可樂達" to "榨汁機食譜。依食譜卡片確認材料與份量。"
+"燒烤拼盤" to "料理鍋食譜。食材與數量請依遊戲內 Recipe: BBQ 卡片確認。",
+"鯰魚豪華餐" to "料理鍋食譜。高級料理；依食譜卡片準備鯰魚與指定食材。",
+"椰子雞" to "料理鍋食譜。依食譜卡片確認椰子與其他材料份量。",
+"頭骨濃湯" to "料理鍋食譜。依食譜卡片確認指定材料。",
+"豐盛燉菜" to "料理鍋食譜。特殊效果料理；依食譜卡片確認材料。",
+"蘑菇煎蛋" to "料理鍋食譜。依食譜卡片確認蘑菇與其他材料份量。",
+"鮭魚沙拉" to "料理鍋食譜。高級料理；依食譜卡片確認材料。",
+"鯊魚晚餐" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"簡易魚湯" to "料理鍋食譜。依食譜卡片確認可替換食材與份量。",
+"果醬牛排" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"壽司" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"蔬菜湯" to "料理鍋食譜。蔬菜可依食譜卡片允許的組合替換。",
+"椰子甜菜飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"芒果香蕉汁" to "榨汁機食譜。依食譜卡片確認水果與份量。",
+"紅色西瓜汁" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"甜菜根特調" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"銀色冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"簡易冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"香辣鳳梨莓果飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"草莓可樂達" to "榨汁機食譜。依食譜卡片確認材料與份量。"
 )
 
 class MainActivity:ComponentActivity(){
@@ -377,7 +377,7 @@ fun GuideApp(){
  val filtered=data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
- bottomBar={NavigationBar{listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
+ bottomBar={Surface(color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -385,7 +385,7 @@ fun GuideApp(){
  FilterChip(selected=mode=="一般模式",onClick={mode="一般模式";chosen=null},label={Text("一般模式")})
  FilterChip(selected=mode=="創造模式",onClick={mode="創造模式";chosen=null},label={Text("創造模式")})
  }
- OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),label={Text("搜尋中文、英文或用途")},singleLine=true)
+ OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),label={Text("搜尋物品名稱或用途")},singleLine=true)
  if(page=="物品百科")LazyRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){items(categories){c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}
  if(chosen==null){
  val list=if(page=="收藏")data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}else filtered
@@ -394,7 +394,7 @@ fun GuideApp(){
  items(list){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
- Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.en+" · "+item.cat,style=MaterialTheme.typography.bodySmall)}
+ Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
  TextButton(onClick={favorites=if(item.name in favorites)favorites-item.name else favorites+item.name}){Text(if(item.name in favorites)"★" else "☆")}
  }
  }}
@@ -405,7 +405,7 @@ fun GuideApp(){
  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)){
  Text(chosen!!.icon,style=MaterialTheme.typography.displayMedium)
  Text(chosen!!.name,style=MaterialTheme.typography.headlineMedium,fontWeight=FontWeight.Bold)
- Text(chosen!!.en,color=MaterialTheme.colorScheme.primary)
+ Text(chosen!!.cat,color=MaterialTheme.colorScheme.primary)
  Text("分類："+chosen!!.cat)
  HorizontalDivider()
  Text("物品用途",fontWeight=FontWeight.Bold);Text(chosen!!.use)
