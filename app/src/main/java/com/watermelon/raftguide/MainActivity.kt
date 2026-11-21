@@ -1,11 +1,6 @@
 package com.watermelon.raftguide
 
 import android.os.Bundle
-import android.content.Context
-import java.net.HttpURLConnection
-import java.net.URL
-import org.json.JSONObject
-import org.json.JSONArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -25,9 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.launch
 
 @Immutable
 data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
@@ -339,40 +331,7 @@ private val recipeInfo = listOf(
 class MainActivity:ComponentActivity(){
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{GuideApp()}}
 }
-private const val DEFAULT_RAFT_AI_ENDPOINT = "https://raft-guide-ai.raft-guide-a0906701882.workers.dev"
-
 @OptIn(ExperimentalMaterial3Api::class)
-
-private suspend fun requestRaftAi(endpoint:String, question:String, history:List<Pair<String,String>>):Pair<String,List<Pair<String,String>>> = withContext(Dispatchers.IO) {
- val connection=(URL(endpoint.trim()).openConnection() as HttpURLConnection)
- try {
-  connection.requestMethod="POST"
-  connection.connectTimeout=15000
-  connection.readTimeout=45000
-  connection.doOutput=true
-  connection.setRequestProperty("Content-Type","application/json; charset=utf-8")
-  val body=JSONObject().put("question",question)
-  val messages=JSONArray()
-  history.takeLast(10).forEach{(role,text)->messages.put(JSONObject().put("role",if(role=="使用者")"user" else "model").put("text",text))}
-  messages.put(JSONObject().put("role","user").put("text",question))
-  body.put("history",messages)
-  connection.outputStream.use{it.write(body.toString().toByteArray(Charsets.UTF_8))}
-  val code=connection.responseCode
-  val stream=if(code in 200..299)connection.inputStream else connection.errorStream
-  val raw=stream.bufferedReader(Charsets.UTF_8).use{it.readText()}
-  val result=JSONObject(raw)
-  if(code !in 200..299) throw IllegalStateException(buildString{append(result.optString("error","AI 服務回應錯誤"));val detail=result.optString("detail");if(detail.isNotBlank())append("\\n詳細原因：").append(detail)})
-  val answer=result.optString("answer","AI 沒有回傳答案")
-  val refs=mutableListOf<Pair<String,String>>()
-  val arr=result.optJSONArray("sources")?:JSONArray()
-  for(i in 0 until arr.length()){
-   val item=arr.optJSONObject(i)?:continue
-   val url=item.optString("url")
-   if(url.startsWith("https://")||url.startsWith("http://")) refs.add(item.optString("title","Raft 參考資料") to url)
-  }
-  answer to refs
- } finally { connection.disconnect() }
-}
 
 private fun answerRaftQuestion(question:String):String{
  val q=question.trim()
@@ -435,6 +394,40 @@ private fun answerRaftQuestion(question:String):String{
  if(listOf("新手","開始","初期","生存","優先").any{q.contains(it)}){
   add("新手起步","先準備淨水器與烤架維持飲水和食物，再製作建築錘擴建木筏、放置收集網、研究桌，逐步解鎖設備。")
  }
+
+ val guideFacts = listOf(
+  Triple("開局第一天","先用塑膠鉤收集木板、塑膠與棕櫚葉，製作簡易淨水器和烤架。先確保淡水與食物，再擴建木筏。",listOf("開局","第一天","初期","新手","開始遊戲")),
+  Triple("塑膠鉤","塑膠鉤是初期收集漂流物的重要工具。瞄準海面上的木板、塑膠、棕櫚葉與桶子後蓄力投擲，拉回時留意漂流方向。",listOf("鉤子","魚鉤","塑膠鉤","收集漂流物")),
+  Triple("淨水與飲水","把海水放入淨水器，依設備種類使用木板燃燒或電力處理，再用杯子或水瓶取水。初期先做簡易淨水器，之後再升級。",listOf("海水","淡水","喝水","淨水","口渴","水")),
+  Triple("食物與烹飪","初期可用烤架烹煮釣到的魚與採集的食物。料理鍋和榨汁機需要依照找到的食譜卡放入正確食材與份量。",listOf("餓","食物","吃飯","烤魚","烤架","烹飪")),
+  Triple("收集網配置","收集網安裝在木筏外緣，讓漂流物隨木筏移動時自動被攔截。多個收集網連成一排可提高收集範圍，記得定期清空。",listOf("收集網","網子","自動收集","漂流物")),
+  Triple("木筏擴建","使用建築錘選擇建造項目，沿木筏外緣擴建地基。擴建前先規劃收集網、設備、種植區與通道，並保留操作空間。",listOf("擴建","地基","建築錘","木筏變大","建造")),
+  Triple("研究桌使用","把尚未研究過的材料放入研究桌完成研究，可解鎖部分製作項目。研究桌本身也需要先製作；新材料取得後可逐一檢查研究清單。",listOf("研究桌","研究","解鎖","科技")),
+  Triple("熔爐與金屬加工","先製作熔爐並準備燃料，把金屬礦、銅礦或其他可冶煉材料放入對應槽位，等待加工完成。不同材料產物不同。",listOf("熔爐","冶煉","金屬礦","銅礦","金屬錠","銅錠")),
+  Triple("海底採集","靠近島嶼並固定木筏後，帶上鉤子潛水採集海底資源。金屬礦、銅礦、沙子、黏土與廢料常見於島嶼周圍海床；留意氧氣與鯊魚。",listOf("海底","潛水","採礦","沙子","黏土","廢料")),
+  Triple("鯊魚與木筏防護","鯊魚會攻擊木筏地基，也會在玩家下水時造成威脅。可留意咬擊聲與木筏受損狀況，探索海底時規劃好往返路線。",listOf("鯊魚","木筏被咬","防護","海底危險")),
+  Triple("種植與農場","依作物大小選擇小型、中型或大型種植箱，放入對應種子並澆水。樹木與草地區需要合適的種植空間；草地可供部分家畜使用。",listOf("種植","農場","種子","作物","澆水","草地")),
+  Triple("動物飼養","捕捉並安置可飼養動物前，先準備圍欄、草地種植區與足夠空間。不同動物提供的資源不同，定期補充草地並收集產物。",listOf("養動物","羊駝","山羊","雞","動物")),
+  Triple("蜂蜜與蜜蜂","蜜蜂出現在特定島嶼的花叢附近。使用掃網捕捉後可製作蜂箱；蜂箱周圍需要花朵才能持續產出蜂蜜相關資源。",listOf("蜂蜜","蜜蜂","蜂箱","蜂巢")),
+  Triple("引擎與燃料","引擎用來推動木筏，需依設備要求提供燃料；生質燃料可由精煉器製作。引擎數量與木筏大小會影響推進需求。",listOf("引擎","燃料","生質燃料","開船")),
+  Triple("帆與方向盤","帆可利用風力推動木筏，方向盤用來調整航向。若需要穩定前往故事地點，可搭配接收器、天線與引擎規劃航行。",listOf("帆","方向盤","航行","轉向")),
+  Triple("接收器與天線","接收器需要電池供電，並搭配天線使用。依畫面上的訊號與座標尋找故事地點；不同存檔顯示的座標可能不同。",listOf("接收器","天線","座標","訊號","導航")),
+  Triple("電池與充電","電池可供接收器等設備使用。後期可研究電池充電器與風力發電機等設備，減少更換或消耗電池的頻率。",listOf("電池","充電","電力","風力發電機")),
+  Triple("交易站","探索大型島嶼時可留意交易站。收集交易站接受的物資與代幣，逐步提升聲望並兌換商品；可兌換項目依進度而定。",listOf("交易站","代幣","聲望","商店")),
+  Triple("故事探索準備","前往故事地點前，整理食物、飲水、工具與背包空間，並確認接收器座標。故事區域可能有解謎、探索路線與特殊環境。",listOf("故事","故事島","章節","探索","劇情")),
+  Triple("背包與物品管理","背包可增加攜帶容量。把常用材料、食物、工具與探索戰利品分開存放，避免探索途中因背包滿載而中斷。",listOf("背包","容量","儲物箱","整理物品")),
+  Triple("生質燃料製作","生質燃料精煉器可把合適的有機材料加工成燃料。依設備提示放入食物等原料，等待加工後再供應相容設備。",listOf("生質燃料","精煉器","燃料製作")),
+  Triple("回收機與交易方塊","回收機可把可回收資源轉換成交易站使用的垃圾方塊。依回收機介面投入合適材料，材料價值與加工時間會有所不同。",listOf("回收機","垃圾方塊","回收","交易方塊")),
+  Triple("滑索與探索","部分故事區域需要使用滑索往返不同高度或地點。先取得並裝備滑索工具，確認滑索連接方向與落點，再開始移動。",listOf("滑索","滑索工具","移動")),
+  Triple("多人遊玩","多人模式可與朋友共同收集、建造與探索。出發前可分配採集、烹飪、航行與建造工作，並注意共享物資的管理。",listOf("多人","朋友","聯機","合作")),
+  Triple("創造模式","創造模式適合自由建造與測試配置，資源取得與生存限制和一般模式不同。查詢配方或物品時，請留意該項目是否為創造模式專用。",listOf("創造模式","創造","自由建造")),
+  Triple("一般模式","一般模式需要收集資源、維持食物與飲水，逐步研究設備並探索故事地點。建議先建立穩定的收集、淨水與烹飪流程。",listOf("一般模式","生存模式","生存")),
+  Triple("鯊魚餌","鯊魚餌可用來吸引鯊魚在一段時間內注意餌料，讓玩家有機會進行海底探索。使用前先規劃好採集路線與時間。",listOf("鯊魚餌","誘餌")),
+  Triple("島嶼探索","小型島嶼可採集地表資源與樹木，大型島嶼通常有更多地形、動物或特殊資源。靠岸前先準備錨、工具、食物與飲水。",listOf("島嶼","小島","大型島","上岸"))
+ )
+ val factMatches=guideFacts.filter{fact->fact.third.any{tag->q.contains(tag,true)}}
+ factMatches.take(5).forEach{fact->add(fact.first,fact.second)}
+
  if(out.isEmpty()){
   val tokens=q.split(Regex("[，。！？、？\\s]+")).filter{it.length>=2}
   val found=data.filter{item->tokens.any{t->item.name.contains(t,true)||item.en.contains(t,true)||item.use.contains(t,true)||item.get.contains(t,true)}}.take(6)
@@ -453,15 +446,7 @@ fun GuideApp(){
  var debouncedQuery by remember{mutableStateOf("")}
  LaunchedEffect(query){delay(180);debouncedQuery=query}
  var aiQuestion by remember{mutableStateOf("")}
- var aiEndpoint by remember{mutableStateOf("")}
- var aiLoading by remember{mutableStateOf(false)}
- var aiAnswer by remember{mutableStateOf("請先設定雲端 AI 網址，再開始詢問 Raft 遊戲問題。")}
- var aiSources by remember{mutableStateOf(emptyList<Pair<String,String>>())}
- val aiHistory=remember{mutableStateListOf<Pair<String,String>>()}
- val aiScope=rememberCoroutineScope()
- val appContext=LocalContext.current
- LaunchedEffect(Unit){aiEndpoint=DEFAULT_RAFT_AI_ENDPOINT}
- LaunchedEffect(aiEndpoint){appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).edit().putString("ai_endpoint",aiEndpoint.trim()).apply()}
+ var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 離線智慧助手。可以問我物品用途、材料取得、製作設備、料理、動物、研究、島嶼與新手生存。")}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
@@ -510,51 +495,24 @@ fun GuideApp(){
  }
  }
  }else if(page=="AI問答"){
- Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom=20.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+ Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)){
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
-   Text("🤖 RAFT 專用 AI 助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-   Text("連線式生成 AI，只回答《Raft》遊戲內容；可搜尋遊戲資料並接續追問。",style=MaterialTheme.typography.bodyMedium)
+   Text("📚 RAFT 離線智慧助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+   Text("完全使用 APK 內建知識庫，不連接網路、不使用 Gemini、不需要 API 金鑰。",style=MaterialTheme.typography.bodyMedium)
+   Text("可查詢物品、材料、設備、配方、料理、動物、研究、島嶼、故事探索與生存技巧。",style=MaterialTheme.typography.bodySmall)
   }}
-  Text("已自動連接雲端 RAFT AI；不用手動輸入網址。API 金鑰安全地保存在雲端。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
-  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 遊戲問題")},placeholder={Text("例如：如何建立自動灑水農場？")},minLines=2)
+  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 問題")},placeholder={Text("例如：前期如何穩定取得淡水？")},minLines=2)
   Button(onClick={
    val q=aiQuestion.trim()
-   if(aiEndpoint.startsWith("https://")&&q.isNotBlank()&&!aiLoading){
-    aiLoading=true
-    aiAnswer="正在搜尋 Raft 遊戲資料並整理答案…"
-    aiSources=emptyList()
-    aiScope.launch{
-     try{
-      val (answer,sources)=requestRaftAi(aiEndpoint,q,aiHistory.toList())
-      aiHistory.add("使用者" to q)
-      aiHistory.add("AI" to answer)
-      while(aiHistory.size>10)aiHistory.removeAt(0)
-      aiAnswer=answer
-      aiSources=sources
-      aiQuestion=""
-     }catch(e:Exception){val offline=answerRaftQuestion(q);aiAnswer="雲端 AI 暫時無法連線（${e.message?: "請檢查網路"}）。以下先提供 App 離線資料庫內容：\n\n"+offline}
-     finally{aiLoading=false}
-    }
-   }else if(!aiEndpoint.startsWith("https://")){aiAnswer="請先填入已部署的 HTTPS 雲端 AI 網址。"}
-  },enabled=aiQuestion.isNotBlank()&&!aiLoading,modifier=Modifier.fillMaxWidth()){
-   Text(if(aiLoading)"正在搜尋…" else "詢問 RAFT AI")
-  }
-  if(aiLoading)LinearProgressIndicator(Modifier.fillMaxWidth())
-  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-   Text("AI 回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
-   Text(aiAnswer)
-   if(aiSources.isNotEmpty()){
-    HorizontalDivider()
-    Text("參考來源",fontWeight=FontWeight.Bold)
-    aiSources.forEach{source->TextButton(onClick={
-     try{appContext.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse(source.second)))}
-     catch(_:Exception){}
-    }){Text(source.first,maxLines=2)}}
+   if(q.isNotBlank()){aiAnswer=answerRaftQuestion(q);aiQuestion=""}
+  },enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("搜尋離線資料")}
+  Card(Modifier.weight(1f,true).fillMaxWidth()){
+   Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+    Text("搜尋結果與攻略",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+    Text(aiAnswer)
    }
-  }}
-  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
-   OutlinedButton(onClick={aiHistory.clear();aiSources=emptyList();aiAnswer="已清除這次對話。"}){Text("清除對話")}
   }
+  Text("資料完全儲存在手機內；沒有收錄的內容會明確提示，不會假裝知道。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
  }
  }else if(page=="料理"){
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
