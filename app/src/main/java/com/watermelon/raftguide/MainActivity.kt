@@ -327,11 +327,48 @@ class MainActivity:ComponentActivity(){
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{GuideApp()}}
 }
 @OptIn(ExperimentalMaterial3Api::class)
+
+private fun answerRaftQuestion(question:String):String{
+ val q=question.trim()
+ if(q.isBlank()) return "請先輸入一個 Raft 問題。"
+ val out=mutableListOf<String>()
+ fun add(title:String,body:String){out.add("• $title\n$body")}
+ if(listOf("料理","食譜","果汁","烹飪","煮").any{q.contains(it)}){
+  add("料理與食譜","料理鍋與榨汁機使用固定食譜組合。食材種類與數量要符合食譜；不符合時可能只會得到剩菜。請打開「料理」頁查看已整理的菜單，實際配方以遊戲內食譜卡為準。")
+  recipeInfo.take(8).forEach{add(it.first,it.second)}
+ }
+ if(listOf("動物","羊駝","山羊","雞","蜜蜂","海鷗","羊毛","牛奶","雞蛋","蜂蜜").any{q.contains(it)}){
+  animalInfo.filter{q.length<5||q.contains("動物")||it.first.contains(q,true)||q.contains(it.first.substringBefore(" "))}.forEach{add(it.first,it.second)}
+ }
+ if(listOf("島","故事","座標","接收器","章節","地點").any{q.contains(it)}){
+  islands.forEach{add(it.first,it.second)}
+  add("故事地點提示","先製作接收器與天線，依接收器顯示的訊號與座標前往故事地點。每個存檔的座標可能不同，請使用自己遊戲中的座標。")
+ }
+ if(listOf("藍圖","研究","解鎖").any{q.contains(it)}){
+  blueprintInfo.take(12).forEach{add(it.first,it.second)}
+  add("研究桌","把新材料放進研究桌完成研究，逐步解鎖可製作項目。故事藍圖也可能在探索故事島嶼時取得。")
+ }
+ val matches=data.filter{it.name.contains(q,true)||it.en.contains(q,true)||it.use.contains(q,true)||it.get.contains(q,true)||it.recipe.contains(q,true)}
+ if(matches.isNotEmpty()) matches.take(8).forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}\n配方：${it.recipe}")}
+ if(listOf("新手","開始","初期","生存","優先").any{q.contains(it)}){
+  add("新手起步","先準備淨水器與烤架維持飲水和食物，再製作建築錘擴建木筏、放置收集網、研究桌，逐步解鎖設備。")
+ }
+ if(out.isEmpty()){
+  val tokens=q.split(Regex("[，。！？、？\\s]+")).filter{it.length>=2}
+  val found=data.filter{item->tokens.any{t->item.name.contains(t,true)||item.en.contains(t,true)||item.use.contains(t,true)||item.get.contains(t,true)}}.take(6)
+  found.forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}")}
+ }
+ if(out.isEmpty()) return "目前離線百科找不到足夠資料回答「$q」。你可以改問物品名稱、材料用途、料理、動物、藍圖、故事島嶼或新手玩法。這個版本是本機知識庫助手，並非連線大型語言模型，因此不會假裝能回答資料庫以外的所有問題。"
+ return "根據 App 目前整理的 Raft 知識庫：\n\n"+out.distinct().take(14).joinToString("\n\n")+"\n\n提醒：若遊戲版本或存檔內容不同，請以遊戲內資訊為準。"
+}
+
 @Composable
 fun GuideApp(){
  var mode by remember{mutableStateOf("一般模式")}
  var page by remember{mutableStateOf("物品百科")}
  var query by remember{mutableStateOf("")}
+ var aiQuestion by remember{mutableStateOf("")}
+ var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 指南內建百科助手。可以問我材料用途、設備、料理、動物、藍圖、島嶼與新手玩法。")}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
@@ -339,7 +376,7 @@ fun GuideApp(){
  val filtered=data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
- bottomBar={NavigationBar{listOf("物品百科","收藏","料理","動物","藍圖","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
+ bottomBar={NavigationBar{listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -377,6 +414,23 @@ fun GuideApp(){
  Button(onClick={favorites=if(chosen!!.name in favorites)favorites-chosen!!.name else favorites+chosen!!.name}){Text(if(chosen!!.name in favorites)"取消收藏" else "加入收藏")}
  }}
  }
+ }
+ }else if(page=="AI問答"){
+ Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(10.dp)){
+  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+   Text("🤖 RAFT 遊戲百科助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+   Text("離線知識庫問答：搜尋本 App 已整理的物品、料理、動物、藍圖、島嶼與新手指南。遇到資料庫沒有的問題，我會明確告訴你，不會亂編。",style=MaterialTheme.typography.bodyMedium)
+  }}
+  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入你的 Raft 問題")},placeholder={Text("例如：電池怎麼充電？哪裡找鈦礦？")},minLines=2)
+  Button(onClick={aiAnswer=answerRaftQuestion(aiQuestion)},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("詢問 RAFT 助手")}
+  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+   Text("回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+   Text(aiAnswer)
+  }}
+  Text("試試看：",fontWeight=FontWeight.Bold)
+  listOf("怎麼製作料理？","動物怎麼照顧？","故事島嶼有哪些？","藍圖有什麼用途？","木筏初期要先做什麼？").forEach{q->
+   OutlinedButton(onClick={aiQuestion=q;aiAnswer=answerRaftQuestion(q)},modifier=Modifier.fillMaxWidth()){Text(q)}
+  }
  }
  }else if(page=="料理"){
  LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){
