@@ -65,9 +65,18 @@ export default {
         return json({ answer: "我是 RAFT 專用助手，只回答《Raft》遊戲相關問題。你可以問我物品、材料、建築、料理、動物、島嶼或故事進度。" });
       }
 
+      const history = Array.isArray(input?.history) ? input.history.slice(-10).filter(m =>
+        m && (m.role === "user" || m.role === "model") &&
+        typeof m.text === "string" && m.text.trim().length > 0 && m.text.length <= 1200
+      ) : [];
+      const contents = history.map(m => ({ role: m.role, parts: [{ text: m.text }] }));
+      if (!contents.length || contents[contents.length - 1].role !== "user" ||
+          contents[contents.length - 1].parts[0].text !== question) {
+        contents.push({ role: "user", parts: [{ text: question }] });
+      }
       const result = await askGemini(env.GEMINI_API_KEY, {
         systemInstruction: { parts: [{ text: SYSTEM_RULES }] },
-        contents: [{ role: "user", parts: [{ text: question }] }],
+        contents,
         tools: [{ google_search: {} }],
         generationConfig: { temperature: 0.25, maxOutputTokens: 900 }
       });
