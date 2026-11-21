@@ -123,8 +123,6 @@ RaftItem("濕磚","Wet Brick","加工材料","🧱","晾乾後製成乾燥磚。
 RaftItem("銅","Copper","礦物材料","🟠","冶煉成銅錠。","島嶼附近海底採集銅礦。","熔爐冶煉。"),
 RaftItem("鈦錠","Titanium Ingot","加工材料","💎","製作高階設備與工具。","鈦礦放入熔爐。","鈦礦 + 熔爐。"),
 RaftItem("電路板","Circuit Board","加工材料","🧩","製作導航、電力與高階設備。","研究解鎖後製作。","需銅錠、藤蔓黏液等材料；依遊戲配方。"),
-RaftItem("爆炸黏液","Explosive Goo","加工材料","🫧","特定探索與製作材料。","探索海底或取得相關資源。","依遊戲內配方表。"),
-RaftItem("爆炸粉末","Explosive Powder","加工材料","🧪","特定遊戲內配方材料。","加工相關材料取得。","本指南不提供危險物品製作細節。"),
 RaftItem("蜂蜜罐","Bee Jar","材料","🍯","收集蜂蜜相關資源。","捕捉蜜蜂取得。","用於蜂蜜相關遊戲配方。"),
 RaftItem("巨型蛤蜊","Giant Clam","海洋材料","🐚","研究材料與裝飾用途。","島嶼附近海底採集。","投入研究桌解鎖相關項目。"),
 RaftItem("泥土","Dirt","地面材料","🟤","建立草地種植區。","使用鏟子在大型島嶼挖掘。","用於草地種植區等配方。"),
@@ -158,6 +156,29 @@ private val islands = listOf(
 "烏托邦" to "故事後期地點，依線索逐步探索各區域。"
 )
 
+
+private val animalInfo = listOf(
+"羊駝 Llama" to "使用草地種植區提供草料並保持圍欄安全；可使用剪刀收集羊毛。",
+"山羊 Goat" to "飼養在木筏圍欄內，使用水桶收集牛奶；記得準備草料。",
+"雞 Clucker" to "飼養在木筏圍欄內，可收集雞蛋；需要草地供應食物。",
+"蜜蜂 Bee" to "在適合的島嶼區域可捕捉，蜂箱周圍需有花朵才能生產蜂蜜。",
+"海鷗 Seagull" to "可能停留在鳥巢附近；留意種植區作物的保護。"
+)
+private val recipeInfo = listOf(
+"簡易蔬菜湯" to "料理鍋料理。依遊戲內食譜卡片放入指定蔬菜與材料，完成後可取得料理。",
+"椰子雞" to "料理鍋料理。依食譜卡片準備椰子與其他指定材料。",
+"魚燉菜" to "料理鍋料理。依食譜卡片準備魚類與蔬菜。",
+"壽司" to "料理鍋料理。依食譜卡片準備魚類與配菜。",
+"水果拼盤" to "料理鍋料理。依食譜卡片準備指定水果。",
+"芒果香蕉汁" to "榨汁機飲品。依食譜卡片放入水果與其他指定材料。",
+"紅色西瓜汁" to "榨汁機飲品。依食譜卡片放入西瓜及其他指定材料。",
+"甜菜根特調" to "榨汁機飲品。依食譜卡片準備甜菜根與指定材料。",
+"銀色冰沙" to "榨汁機飲品。依食譜卡片準備指定水果與材料。",
+"簡易冰沙" to "榨汁機飲品。依食譜卡片準備指定水果。",
+"香辣鳳梨莓果飲" to "榨汁機飲品。依食譜卡片準備鳳梨與指定材料。",
+"草莓可樂達" to "榨汁機飲品。依食譜卡片準備草莓與指定材料。"
+)
+
 class MainActivity:ComponentActivity(){
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{GuideApp()}}
 }
@@ -174,7 +195,7 @@ fun GuideApp(){
  val filtered=data.filter{(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT GUIDE",fontWeight=FontWeight.Black)})},
- bottomBar={NavigationBar{listOf("物品百科","收藏","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
+ bottomBar={NavigationBar{listOf("物品百科","收藏","料理","動物","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"料理"->"🍲";"動物"->"🐾";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -212,6 +233,14 @@ fun GuideApp(){
  Button(onClick={favorites=if(chosen!!.name in favorites)favorites-chosen!!.name else favorites+chosen!!.name}){Text(if(chosen!!.name in favorites)"取消收藏" else "加入收藏")}
  }}
  }
+ }
+ }else if(page=="料理"){
+ LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){
+ items(recipeInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🍲 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
+ }
+ }else if(page=="動物"){
+ LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){
+ items(animalInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🐾 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="新手指南"){
  val tips=listOf("先維持生存" to "優先收集木板、塑膠與棕櫚葉，準備淨水器與烤架。","擴大木筏" to "在木筏外圍設置收集網，定期整理收集到的物資。","研究材料" to "製作研究桌，投入新材料逐步解鎖製作項目。","探索島嶼" to "靠近島嶼後固定木筏，探索陸地與水下並留意補給。","建立農場" to "使用種植箱種植作物，準備草地區照顧可飼養動物。","尋找故事地點" to "製作接收器與天線，依螢幕訊號探索故事地點。","管理資源" to "將材料分類存放，保留木板作為燃料與修理用途。")
