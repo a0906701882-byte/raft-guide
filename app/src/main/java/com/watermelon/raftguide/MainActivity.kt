@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String)
+data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
 private val data = listOf(
 RaftItem("木板","Plank","基礎材料","🪵","建造木筏、設備及作為燃料。","海面漂流物、桶子、木箱。","直接使用於建築與多種配方。"),
 RaftItem("塑膠","Plastic","基礎材料","🧴","製作工具、設備與建築。","海面漂流物、桶子、木箱。","多數配方直接使用。"),
@@ -141,7 +141,82 @@ RaftItem("日曆","Calendar","裝飾","📅","木筏裝飾。","裝飾包或製�
 RaftItem("地毯","Rug","裝飾","🧶","木筏室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
 RaftItem("告示牌","Sign","裝飾","🪧","標記區域與提醒事項。","製作選單取得。","依遊戲內配方表。"),
 RaftItem("獎盃展示板","Trophy Board","裝飾","🏆","展示探索或成就紀念品。","裝飾包或探索取得。","依遊戲內配方表。"),
-RaftItem("鳥巢","Birds Nest","動物設備","🪺","吸引海鷗停留並收集羽毛。","製作選單製作。","依遊戲內配方表。")
+RaftItem("鳥巢","Birds Nest","動物設備","🪺","吸引海鷗停留並收集羽毛。","製作選單製作。","依遊戲內配方表。"),
+RaftItem("進階烤架","Advanced Grill","烹飪設備","🔥","一次烹煮較多食物。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("儲物櫃","Storage","儲存設備","🗄️","收納木筏物品。","製作選單解鎖。","依遊戲內配方表。"),
+RaftItem("垃圾桶","Trashcan","木筏設備","🗑️","整理不需要的物品。","製作選單或研究解鎖。","依遊戲內配方表。"),
+RaftItem("沙發","Sofa","家具","🛋️","木筏室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("櫥櫃","Cupboard","家具","🚪","木筏室內裝飾與收納。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("細節木板","Detail Plank","裝飾","🪵","建築細節裝飾。","藍圖或裝飾包取得。","依遊戲內配方表。"),
+RaftItem("金屬燈籠","Metal Lantern","照明設備","🏮","照亮木筏區域。","裝飾包或探索取得。","依遊戲內配方表。"),
+RaftItem("火盆","Fire Basket","裝飾","🔥","木筏裝飾照明。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("壁爐","Fireplace","裝飾","🪵","室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("畫作","Painting","裝飾","🖼️","裝飾木筏牆面。","探索或裝飾包取得。","依遊戲內配方表。"),
+RaftItem("勵志語錄","Motivational Quote","裝飾","💬","牆面文字裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("書堆","Bookpile","裝飾","📚","室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("打開的書","Open Book","裝飾","📖","室內桌面裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("紙張組","Paper Bundle","裝飾","📄","室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("燭台","Candlestick","照明設備","🕯️","室內裝飾照明。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("串燈","String Light","照明設備","✨","木筏裝飾照明。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("餐具","Cutlery","裝飾","🍴","餐桌裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("馬克杯","Mug","裝飾","☕","桌面裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("旗幟","Flag","裝飾","🚩","木筏外觀裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("羽毛筆","Quill","裝飾","🪶","桌面裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("地球儀","World Globe","裝飾","🌍","室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("窗簾","Curtain","裝飾","🪟","室內裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("戶外廁所","Outhouse","裝飾","🚻","木筏裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("木製浴缸","Wooden Bathtub","裝飾","🛁","木筏裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("柴火架","Firewood Rack","裝飾","🪵","木筏裝飾。","裝飾包取得。","依遊戲內配方表。"),
+RaftItem("背包","Backpack","裝備","🎒","增加攜帶容量。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("蛙鞋","Flippers","裝備","🤿","提升水下移動便利性。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("氧氣瓶","Oxygen Bottle","裝備","🫧","延長水下探索時間。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("船長帽","Captain’s Hat","裝備","🧢","角色外觀收藏。","探索取得。","不可製作。"),
+RaftItem("飛行員頭盔","Pilot Helmet","裝備","🪖","角色外觀收藏。","探索取得。","不可製作。"),
+RaftItem("洞穴蘑菇","Cave Mushroom","食物","🍄","可作為料理材料。","探索洞穴採集。","依食譜卡片使用。"),
+RaftItem("紅莓","Red Berries","食物","🍒","可食用或作為料理材料。","森林島嶼採集。","依食譜卡片使用。"),
+RaftItem("銀藻","Silver Algae","食物材料","🌿","料理材料。","水下探索採集。","依食譜卡片使用。"),
+RaftItem("桶裝牛奶","Bucket of Milk","食物","🥛","飲用或料理材料。","以水桶向山羊收集。","依食譜卡片使用。"),
+RaftItem("生鯰魚","Raw Catfish","食物","🐟","烹煮後食用。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟鯰魚","Cooked Catfish","食物","🍽️","可直接食用。","烹煮生鯰魚。","烤架。"),
+RaftItem("生鯡魚","Raw Herring","食物","🐟","烹煮或料理材料。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟鯡魚","Cooked Herring","食物","🍽️","可直接食用。","烹煮生鯡魚。","烤架。"),
+RaftItem("生鯖魚","Raw Mackerel","食物","🐟","烹煮或料理材料。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟鯖魚","Cooked Mackerel","食物","🍽️","可直接食用。","烹煮生鯖魚。","烤架。"),
+RaftItem("生鮭魚","Raw Salmon","食物","🐟","烹煮或料理材料。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟鮭魚","Cooked Salmon","食物","🍽️","可直接食用。","烹煮生鮭魚。","烤架。"),
+RaftItem("生羅非魚","Raw Tilapia","食物","🐟","烹煮或料理材料。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟羅非魚","Cooked Tilapia","食物","🍽️","可直接食用。","烹煮生羅非魚。","烤架。"),
+RaftItem("生鯧魚","Raw Pomfret","食物","🐟","烹煮或料理材料。","釣魚取得。","烤架或料理鍋。"),
+RaftItem("熟鯧魚","Cooked Pomfret","食物","🍽️","可直接食用。","烹煮生鯧魚。","烤架。"),
+RaftItem("生雞腿","Raw Drumstick","食物","🍗","料理材料。","取得食材。","依食譜卡片使用。"),
+RaftItem("熟雞腿","Cooked Drumstick","食物","🍗","可直接食用。","烹煮生雞腿。","烤架。"),
+RaftItem("熟肉","Cooked Meat","食物","🍖","可直接食用。","烹煮肉類食材。","烤架。"),
+RaftItem("熟甜菜根","Cooked Beet","食物","🫜","可直接食用。","烹煮生甜菜根。","烤架。"),
+RaftItem("熟馬鈴薯","Cooked Potato","食物","🥔","可直接食用。","烹煮生馬鈴薯。","烤架。"),
+RaftItem("熟鯊魚肉","Cooked Shark Meat","食物","🍖","遊戲內熟食項目。","烹煮後取得。","本指南不提供戰鬥或捕獵教學。"),
+RaftItem("蕉種子","Banana Seed","創造模式雜項","🌱","種植香蕉植株。","創造模式物品清單。","種植於大型種植箱。",true),
+RaftItem("棕櫚樹種子","Palm Seed","創造模式雜項","🌴","種植棕櫚樹。","創造模式物品清單。","種植於大型種植箱。",true),
+RaftItem("芒果種子","Mango Seed","創造模式雜項","🥭","種植芒果樹。","創造模式物品清單。","種植於大型種植箱。",true),
+RaftItem("松果","Pinecone","創造模式雜項","🌲","種植松樹。","創造模式物品清單。","種植於大型種植箱。",true),
+RaftItem("樺樹種子","Birch Seed","創造模式雜項","🌳","種植樺樹。","創造模式物品清單。","種植於大型種植箱。",true),
+RaftItem("西瓜種子","Watermelon Seed","創造模式雜項","🍉","種植西瓜。","創造模式物品清單。","種植於中型種植箱。",true),
+RaftItem("鳳梨種子","Pineapple Seed","創造模式雜項","🍍","種植鳳梨。","創造模式物品清單。","種植於中型種植箱。",true),
+RaftItem("草莓種子","Strawberry Seed","創造模式雜項","🍓","種植草莓。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("黑色花種子","Black Seed","創造模式雜項","🌱","種植黑色花朵。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("藍色花種子","Blue Seed","創造模式雜項","🌱","種植藍色花朵。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("紅色花種子","Red Seed","創造模式雜項","🌱","種植紅色花朵。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("白色花種子","White Seed","創造模式雜項","🌱","種植白色花朵。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("黃色花種子","Yellow Seed","創造模式雜項","🌱","種植黃色花朵。","創造模式物品清單。","種植於小型種植箱。",true),
+RaftItem("唐加羅瓦植物","Tangaroa Plant","創造模式雜項","🪴","故事地點主題裝飾植物。","創造模式物品清單。","裝飾用途。",true),
+RaftItem("幸運貓","Lucky Cat","創造模式雜項","🐱","收藏裝飾。","創造模式物品清單。","裝飾用途。",true),
+RaftItem("主要湯姆模型","Major Tom","創造模式雜項","🚀","收藏裝飾。","創造模式物品清單。","裝飾用途。",true),
+RaftItem("玩具機器人","Toy Robot","創造模式雜項","🤖","收藏裝飾。","創造模式物品清單。","裝飾用途。",true),
+RaftItem("黃金玩具機器人","Golden Toy Robot","創造模式雜項","🤖","收藏裝飾。","創造模式物品清單。","裝飾用途。",true),
+RaftItem("提基零件","Tiki Piece","創造模式雜項","🗿","收集組合型裝飾。","探索與創造模式物品清單。","收藏用途。",true),
+RaftItem("舊鞋","Old Shoe","創造模式雜項","👞","趣味收集物。","創造模式物品清單。","可作為裝飾或種植用途。",true),
+RaftItem("收音機","Radio","創造模式雜項","📻","播放遊戲音樂。","創造模式物品清單。","裝飾與音樂用途。",true),
+RaftItem("鋼琴","Piano","創造模式雜項","🎹","可演奏音樂。","創造模式物品清單。","互動裝飾。",true),
+RaftItem("錄音帶","Cassette Tapes","創造模式雜項","📼","音樂收藏。","探索或創造模式物品清單。","收藏用途。",true),
 )
 private val islands = listOf(
 "小島" to "採集樹木、椰子與其他植物；在島嶼周圍海底尋找礦物、沙子與黏土。",
@@ -165,18 +240,29 @@ private val animalInfo = listOf(
 "海鷗 Seagull" to "可能停留在鳥巢附近；留意種植區作物的保護。"
 )
 private val recipeInfo = listOf(
-"簡易蔬菜湯" to "料理鍋料理。依遊戲內食譜卡片放入指定蔬菜與材料，完成後可取得料理。",
-"椰子雞" to "料理鍋料理。依食譜卡片準備椰子與其他指定材料。",
-"魚燉菜" to "料理鍋料理。依食譜卡片準備魚類與蔬菜。",
-"壽司" to "料理鍋料理。依食譜卡片準備魚類與配菜。",
-"水果拼盤" to "料理鍋料理。依食譜卡片準備指定水果。",
-"芒果香蕉汁" to "榨汁機飲品。依食譜卡片放入水果與其他指定材料。",
-"紅色西瓜汁" to "榨汁機飲品。依食譜卡片放入西瓜及其他指定材料。",
-"甜菜根特調" to "榨汁機飲品。依食譜卡片準備甜菜根與指定材料。",
-"銀色冰沙" to "榨汁機飲品。依食譜卡片準備指定水果與材料。",
-"簡易冰沙" to "榨汁機飲品。依食譜卡片準備指定水果。",
-"香辣鳳梨莓果飲" to "榨汁機飲品。依食譜卡片準備鳳梨與指定材料。",
-"草莓可樂達" to "榨汁機飲品。依食譜卡片準備草莓與指定材料。"
+"燒烤拼盤 BBQ" to "料理鍋料理。依遊戲內食譜卡片確認食材與份量。",
+"鯰魚豪華餐 Catfish Deluxe" to "料理鍋料理。依食譜卡片準備鯰魚與指定配料。",
+"椰子雞 Coconut Chicken" to "料理鍋料理。依食譜卡片準備椰子與指定配料。",
+"果醬雞腿 Drumstick with Jam" to "料理鍋料理。依食譜卡片準備雞腿與指定配料。",
+"魚湯 Fish Stew" to "料理鍋料理。依食譜卡片準備魚類與指定配料。",
+"水果什錦 Fruit Compot" to "料理鍋料理。依食譜卡片準備水果。",
+"頭骨濃湯 Head Broth" to "料理鍋料理。依食譜卡片準備指定食材。",
+"豐盛燉菜 Hearty Stew" to "料理鍋料理。依食譜卡片準備指定食材。",
+"蘑菇煎蛋 Mushroom Omelette" to "料理鍋料理。依食譜卡片準備蘑菇與蛋。",
+"鮭魚沙拉 Salmon Salad" to "料理鍋料理。依食譜卡片準備鮭魚與蔬菜。",
+"鯊魚晚餐 Shark Dinner" to "料理鍋料理。依食譜卡片確認指定食材。",
+"簡易魚湯 Simple Fish Stew" to "料理鍋料理。依食譜卡片準備魚類與蔬菜。",
+"果醬牛排 Steak with Jam" to "料理鍋料理。依食譜卡片準備指定食材。",
+"壽司 Sushi" to "料理鍋料理。依食譜卡片準備魚類與配料。",
+"蔬菜湯 Vegetable Soup" to "料理鍋料理。依食譜卡片準備蔬菜。",
+"簡易冰沙 Simple Smoothie" to "榨汁機飲品。依食譜卡片準備指定水果。",
+"椰子甜菜飲 Coconut Beat" to "榨汁機飲品。依食譜卡片準備椰子與甜菜根。",
+"芒果香蕉汁 Mangonana" to "榨汁機飲品。依食譜卡片準備水果。",
+"紅色西瓜汁 Red Melon" to "榨汁機飲品。依食譜卡片準備西瓜與指定配料。",
+"甜菜根特調 Redbeet Shot" to "榨汁機飲品。依食譜卡片準備甜菜根。",
+"銀色冰沙 Silver Smoothie" to "榨汁機飲品。依食譜卡片準備指定材料。",
+"香辣鳳梨莓果飲 Spicy Pineberry" to "榨汁機飲品。依食譜卡片準備指定材料。",
+"草莓可樂達 Strawberry Colada" to "榨汁機飲品。依食譜卡片準備草莓與指定材料。"
 )
 
 class MainActivity:ComponentActivity(){
@@ -192,9 +278,9 @@ fun GuideApp(){
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
  val categories=listOf("全部")+data.map{it.cat}.distinct()
- val filtered=data.filter{(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
+ val filtered=data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
- Scaffold(topBar={TopAppBar(title={Text("RAFT GUIDE",fontWeight=FontWeight.Black)})},
+ Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
  bottomBar={NavigationBar{listOf("物品百科","收藏","料理","動物","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"料理"->"🍲";"動物"->"🐾";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
