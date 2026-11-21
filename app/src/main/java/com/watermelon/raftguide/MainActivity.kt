@@ -468,7 +468,7 @@ fun GuideApp(){
  if(page=="物品百科")LazyRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){items(categories){c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}
  if(chosen==null){
  val list=if(page=="收藏")favoriteItems else filtered
-  Text("${if(page=="收藏")"收藏" else mode}目前顯示 ${list.size} 項",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.primary)
+  Text("目前顯示 ${list.size} 項",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.primary)
 
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
  items(list,key={it.name+it.cat},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
