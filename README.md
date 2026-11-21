@@ -39,3 +39,13 @@ Raft Wiki 的 Items 條目記載遊戲共有 201 項物品，並分成食物與�
 GitHub Actions 會在推送程式碼後嘗試建置 Debug APK。到 Actions 頁面開啟最新的 **Build Android APK** 執行紀錄；若該次工作流程成功，下載 **RAFT-GUIDE-debug-apk** Artifact。
 
 依使用者要求，本次未進行人工安裝或操作測試；因此不保證 APK 已在實機安裝執行。
+
+
+## 線上 Raft 專用 AI（後端初步建置）
+- 已新增 `backend/worker.js`：Gemini 生成式 AI 後端，先判斷問題是否屬於 Raft，再回答；非 Raft 問題會被拒絕。
+- 已加入 Raft 範圍限制、繁體中文回答、資料不足時不得捏造，以及非戰鬥內容範圍限制。
+- 使用 Gemini Google 搜尋功能取得遊戲相關參考資料，若有搜尋來源會回傳來源連結。
+- API 金鑰只允許存放在伺服器環境變數 `GEMINI_API_KEY`，絕不可寫入 Android APK 或提交到 GitHub。
+- `backend/wrangler.toml` 是 Cloudflare Worker 部署設定。
+
+**目前狀態：後端程式骨架已加入，但尚未部署，也尚未接到 Android App。** 要正式啟用，仍需由使用者與家長／監護人協助建立並設定 API 金鑰及雲端 Worker，之後再把 Worker 網址接入 App。請勿把 API 金鑰貼在聊天或公開 GitHub。
