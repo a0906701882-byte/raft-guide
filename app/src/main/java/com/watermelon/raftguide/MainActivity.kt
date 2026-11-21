@@ -449,6 +449,8 @@ fun GuideApp(){
  var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 離線智慧助手。可以問我物品用途、材料取得、製作設備、料理、動物、研究、島嶼與新手生存。")}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
+ var selectedBlueprint by remember{mutableStateOf<Pair<String,String>?>(null)}
+ var selectedIsland by remember{mutableStateOf<Pair<String,String>?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
  val categories=remember{listOf("全部")+data.map{it.cat}.distinct()}
  val filtered=remember(mode,category,debouncedQuery){data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
@@ -523,12 +525,69 @@ fun GuideApp(){
  items(animalInfo,contentType={"animal"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🐾 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="藍圖"){
- LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(blueprintInfo,contentType={"blueprint"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("📜 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}}
+ if(selectedBlueprint==null){
+  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
+   items(blueprintInfo,key={it.first},contentType={"blueprint"}){entry->
+    Card(Modifier.fillMaxWidth().clickable{selectedBlueprint=entry}){
+     Row(Modifier.padding(15.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)){
+      Text("📜",style=MaterialTheme.typography.titleLarge)
+      Column(Modifier.weight(1f)){Text(entry.first,fontWeight=FontWeight.Bold);Text(entry.second,maxLines=2,style=MaterialTheme.typography.bodySmall)}
+      Text("查看 ›",color=MaterialTheme.colorScheme.primary)
+     }
+    }
+   }
+  }
+ }else{
+  TextButton(onClick={selectedBlueprint=null}){Text("← 返回藍圖列表")}
+  Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
+   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+    Text("📜",style=MaterialTheme.typography.displayMedium)
+    Text(selectedBlueprint!!.first,style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)
+    Text("藍圖詳細資料",color=MaterialTheme.colorScheme.primary,fontWeight=FontWeight.Bold)
+    Text(selectedBlueprint!!.second)
+    HorizontalDivider()
+    Text("如何解鎖",fontWeight=FontWeight.Bold)
+    Text("找到藍圖後，帶回木筏並在研究桌完成研究，才會解鎖對應製作項目。部分藍圖需要推進故事或探索特定地點才能取得。")
+    Text("使用提醒",fontWeight=FontWeight.Bold)
+    Text("解鎖後可在製作選單查看所需材料。若尚未顯示配方，請確認研究桌是否已研究藍圖及相關材料。")
+    Text("目前未逐張核實所有藍圖的精確拾取位置，因此不提供未確認座標。",style=MaterialTheme.typography.bodySmall)
+   }}
+  }
+ }
  }else if(page=="新手指南"){
  val tips=listOf("先維持生存" to "優先收集木板、塑膠與棕櫚葉，準備淨水器與烤架。","擴大木筏" to "在木筏外圍設置收集網，定期整理收集到的物資。","研究材料" to "製作研究桌，投入新材料逐步解鎖製作項目。","探索島嶼" to "靠近島嶼後固定木筏，探索陸地與水下並留意補給。","建立農場" to "使用種植箱種植作物，準備草地區照顧可飼養動物。","尋找故事地點" to "製作接收器與天線，依螢幕訊號探索故事地點。","管理資源" to "將材料分類存放，保留木板作為燃料與修理用途。")
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(tips,contentType={"guide"}){tip->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp)){Text(tip.first,fontWeight=FontWeight.Bold);Text(tip.second)}}}}
  }else{
- LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){items(islands,contentType={"island"}){island->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🏝️ "+island.first,fontWeight=FontWeight.Bold);Text(island.second)}}}}
+ if(selectedIsland==null){
+  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
+   items(islands,key={it.first},contentType={"island"}){island->
+    Card(Modifier.fillMaxWidth().clickable{selectedIsland=island}){
+     Row(Modifier.padding(15.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)){
+      Text("🏝️",style=MaterialTheme.typography.titleLarge)
+      Column(Modifier.weight(1f)){Text(island.first,fontWeight=FontWeight.Bold);Text(island.second,maxLines=2,style=MaterialTheme.typography.bodySmall)}
+      Text("查看 ›",color=MaterialTheme.colorScheme.primary)
+     }
+    }
+   }
+  }
+ }else{
+  TextButton(onClick={selectedIsland=null}){Text("← 返回島嶼列表")}
+  Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
+   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+    Text("🏝️",style=MaterialTheme.typography.displayMedium)
+    Text(selectedIsland!!.first,style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)
+    Text("地點介紹",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+    Text(selectedIsland!!.second)
+    HorizontalDivider()
+    Text("探索前準備",fontWeight=FontWeight.Bold)
+    Text("建議準備食物、飲水、工具與足夠背包空間。若探索水下區域，留意氧氣並規劃返回木筏的路線。")
+    Text("探索提示",fontWeight=FontWeight.Bold)
+    val storyPlace=selectedIsland!!.first in listOf("無線電塔","瓦薩加坦","巴爾博亞島","商隊小鎮","唐加羅瓦","瓦魯納角","坦佩雷斯","烏托邦")
+    Text(if(storyPlace)"這是故事進度相關地點。留意筆記、藍圖、密碼或環境線索；依接收器顯示的座標前往，座標可能因存檔而不同。" else "沿海岸與島嶼周圍海床探索，留意資源、補給與可互動物件。世界生成與遊戲進度可能影響遇到的內容。")
+    Text("此頁提供通用探索指南；未確認的固定座標與掉落清單不會當成確定資訊。",style=MaterialTheme.typography.bodySmall)
+   }}
+  }
+ }
  }
  }
  }
