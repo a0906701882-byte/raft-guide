@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 
+@Immutable
 data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
 private val data = listOf(
 RaftItem("木板","Plank","基礎材料","🪵","建造木筏、設備及作為燃料。","海面漂流物、桶子、木箱。","直接使用於建築與多種配方。"),
@@ -463,8 +465,9 @@ fun GuideApp(){
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
- val categories=listOf("全部")+data.map{it.cat}.distinct()
+ val categories=remember{listOf("全部")+data.map{it.cat}.distinct()}
  val filtered=remember(mode,category,debouncedQuery){data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
+ val favoriteItems=remember(favorites,query){data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
  bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
@@ -478,7 +481,7 @@ fun GuideApp(){
  OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),label={Text("搜尋物品名稱或用途")},singleLine=true)
  if(page=="物品百科")LazyRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){items(categories){c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}
  if(chosen==null){
- val list=if(page=="收藏")data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}else filtered
+ val list=if(page=="收藏")favoriteItems else filtered
  Text("目前顯示 "+list.size+" 項",color=MaterialTheme.colorScheme.primary)
  LazyColumn(verticalArrangement=Arrangement.spacedBy(7.dp),contentPadding=PaddingValues(bottom=28.dp)){
  items(list,key={it.name+it.cat}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
