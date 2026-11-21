@@ -94,33 +94,6 @@ export default {
     }
 
     try {
-      const classify = await askGemini(env.GEMINI_API_KEY, {
-        systemInstruction: {
-          parts: [{
-            text: "你是嚴格的遊戲主題分類器。根據最近對話判斷目前問題是否在詢問電腦遊戲 Raft（木筏求生）。延續前文的簡短追問也算 Raft。若話題明確轉到其他遊戲或現實生活，判定 false。只輸出 JSON：{\\"isRaft\\":true 或 false}。"
-          }]
-        },
-        contents,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0
-        }
-      });
-
-      const classificationText =
-        classify?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "{}";
-      let classification = {};
-      try {
-        classification = JSON.parse(classificationText);
-      } catch {}
-
-      if (classification.isRaft !== true) {
-        return json({
-          answer: "我是 RAFT 專用助手，只回答《Raft》遊戲相關問題。你可以問我物品、材料、建築、料理、動物、島嶼或故事進度。",
-          sources: []
-        });
-      }
-
       const result = await askGemini(env.GEMINI_API_KEY, {
         systemInstruction: { parts: [{ text: SYSTEM_RULES }] },
         contents,
