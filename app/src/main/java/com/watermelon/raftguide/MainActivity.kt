@@ -458,7 +458,7 @@ fun GuideApp(){
  val aiHistory=remember{mutableStateListOf<Pair<String,String>>()}
  val aiScope=rememberCoroutineScope()
  val appContext=LocalContext.current
- LaunchedEffect(Unit){val saved=appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).getString("ai_endpoint","")?:"";aiEndpoint=if(saved.startsWith("https://"))saved else DEFAULT_RAFT_AI_ENDPOINT}
+ LaunchedEffect(Unit){aiEndpoint=DEFAULT_RAFT_AI_ENDPOINT}
  LaunchedEffect(aiEndpoint){appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).edit().putString("ai_endpoint",aiEndpoint.trim()).apply()}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
