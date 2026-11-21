@@ -1,4 +1,4 @@
-# RAFT GUIDE
+# RAFT 指南
 
 繁體中文 Raft Android 離線指南專案。
 
