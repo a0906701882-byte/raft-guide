@@ -468,7 +468,7 @@ fun GuideApp(){
  if(page=="物品百科")LazyRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){items(categories){c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}
  if(chosen==null){
  val list=if(page=="收藏")favoriteItems else filtered
- Text("目前顯示 "+list.size+" 項｜資料仍在逐項核對，未標明確切材料的項目不代表已確認配方。",color=MaterialTheme.colorScheme.primary)
+ Text("資料仍在逐項核對，未標明確切材料的項目不代表已確認配方。",color=MaterialTheme.colorScheme.primary)
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
  items(list,key={it.name+it.cat},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
