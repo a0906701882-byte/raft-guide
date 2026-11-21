@@ -42,7 +42,10 @@ async function askGemini(apiKey, body) {
   );
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data?.error?.message || `Gemini API error: ${response.status}`);
+    const error = new Error(data?.error?.message || `Gemini API error: ${response.status}`);
+    error.httpStatus = response.status;
+    error.googleError = data?.error || {};
+    throw error;
   }
   return data;
 }
@@ -126,7 +129,10 @@ export default {
     } catch (error) {
       return json({
         error: "AI 服務暫時無法使用，請稍後再試。",
-        detail: String(error?.message || error).slice(0, 240)
+        detail: String(error?.message || error).slice(0, 240),
+        googleHttpStatus: error?.httpStatus || null,
+        googleErrorCode: error?.googleError?.code || null,
+        quotaDetails: error?.googleError?.details || []
       }, 502);
     }
   }
