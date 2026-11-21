@@ -362,6 +362,7 @@ private fun answerRaftQuestion(question:String):String{
  return "根據 App 目前整理的 Raft 知識庫：\n\n"+out.distinct().take(14).joinToString("\n\n")+"\n\n提醒：若遊戲版本或存檔內容不同，請以遊戲內資訊為準。"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuideApp(){
  var mode by remember{mutableStateOf("一般模式")}
