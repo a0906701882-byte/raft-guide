@@ -561,7 +561,7 @@ fun GuideApp(){
  items(recipeInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🍲 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="動物"){
- LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
  items(animalInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🐾 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="藍圖"){
