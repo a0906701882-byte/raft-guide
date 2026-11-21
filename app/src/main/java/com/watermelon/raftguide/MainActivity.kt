@@ -510,7 +510,7 @@ fun GuideApp(){
  }
  }
  }else if(page=="AI問答"){
- Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(10.dp)){
+ Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom=20.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
    Text("🤖 RAFT 專用 AI 助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
    Text("連線式生成 AI，只回答《Raft》遊戲內容；可搜尋遊戲資料並接續追問。",style=MaterialTheme.typography.bodyMedium)
