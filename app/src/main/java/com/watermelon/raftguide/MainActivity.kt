@@ -339,6 +339,37 @@ class MainActivity:ComponentActivity(){
 }
 @OptIn(ExperimentalMaterial3Api::class)
 
+private suspend fun requestRaftAi(endpoint:String, question:String, history:List<Pair<String,String>>):Pair<String,List<Pair<String,String>>> = withContext(Dispatchers.IO) {
+ val connection=(URL(endpoint.trim()).openConnection() as HttpURLConnection)
+ try {
+  connection.requestMethod="POST"
+  connection.connectTimeout=15000
+  connection.readTimeout=45000
+  connection.doOutput=true
+  connection.setRequestProperty("Content-Type","application/json; charset=utf-8")
+  val body=JSONObject().put("question",question)
+  val messages=JSONArray()
+  history.takeLast(10).forEach{(role,text)->messages.put(JSONObject().put("role",if(role=="使用者")"user" else "model").put("text",text))}
+  messages.put(JSONObject().put("role","user").put("text",question))
+  body.put("history",messages)
+  connection.outputStream.use{it.write(body.toString().toByteArray(Charsets.UTF_8))}
+  val code=connection.responseCode
+  val stream=if(code in 200..299)connection.inputStream else connection.errorStream
+  val raw=stream.bufferedReader(Charsets.UTF_8).use{it.readText()}
+  val result=JSONObject(raw)
+  if(code !in 200..299) throw IllegalStateException(result.optString("error","AI 服務回應錯誤"))
+  val answer=result.optString("answer","AI 沒有回傳答案")
+  val refs=mutableListOf<Pair<String,String>>()
+  val arr=result.optJSONArray("sources")?:JSONArray()
+  for(i in 0 until arr.length()){
+   val item=arr.optJSONObject(i)?:continue
+   val url=item.optString("url")
+   if(url.startsWith("https://")||url.startsWith("http://")) refs.add(item.optString("title","Raft 參考資料") to url)
+  }
+  answer to refs
+ } finally { connection.disconnect() }
+}
+
 private fun answerRaftQuestion(question:String):String{
  val q=question.trim()
  if(q.isBlank()) return "請先輸入一個 Raft 問題。"
