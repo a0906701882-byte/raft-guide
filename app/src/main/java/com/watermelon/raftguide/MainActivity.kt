@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
 private val data = listOf(
@@ -349,7 +350,38 @@ private fun answerRaftQuestion(question:String):String{
   blueprintInfo.take(12).forEach{add(it.first,it.second)}
   add("研究桌","把新材料放進研究桌完成研究，逐步解鎖可製作項目。故事藍圖也可能在探索故事島嶼時取得。")
  }
- val matches=data.filter{it.name.contains(q,true)||it.en.contains(q,true)||it.use.contains(q,true)||it.get.contains(q,true)||it.recipe.contains(q,true)}
+ val aliases=mapOf(
+  "水" to listOf("淨水","飲水","水壺","水桶","淡水","海水"),
+  "喝水" to listOf("淨水器","飲水設備","淡水"),
+  "吃" to listOf("食物","料理","烤架","料理鍋"),
+  "食物" to listOf("料理","烤架","魚竿","作物"),
+  "船" to listOf("木筏","引擎","帆","方向盤","錨"),
+  "開船" to listOf("引擎","帆","方向盤"),
+  "導航" to listOf("接收器","天線","電池","故事地點"),
+  "定位" to listOf("接收器","天線","故事地點"),
+  "電" to listOf("電池","電池充電器","電力設備","風力發電機"),
+  "種田" to listOf("種植箱","草地種植區","灑水器","種子"),
+  "種植" to listOf("種植箱","草地種植區","種子","作物"),
+  "養動物" to listOf("羊駝","山羊","雞","蜜蜂","草地種植區"),
+  "蜂蜜" to listOf("蜂箱","蜂巢","蜜蜂"),
+  "背包" to listOf("大型背包","皮革","羊毛"),
+  "挖礦" to listOf("金屬礦","銅礦","鈦礦","沙子","黏土"),
+  "金屬" to listOf("金屬礦","金屬錠","熔爐"),
+  "故事" to listOf("無線電塔","瓦薩加坦","巴爾博亞島","商隊小鎮","唐加羅瓦","瓦魯納角","坦佩雷斯","烏托邦")
+ )
+ val expanded=(listOf(q)+aliases.filterKeys{q.contains(it)}.values.flatten()).distinct()
+ val tokens=q.split(Regex("[，。！？、？\\s]+")).filter{it.length>=1}
+ val matches=data.map{item->
+  val score=expanded.sumOf{term->
+   (if(item.name.contains(term,true)) 12 else 0)+
+   (if(item.en.contains(term,true)) 7 else 0)+
+   (if(item.cat.contains(term,true)) 5 else 0)+
+   (if(item.use.contains(term,true)) 4 else 0)+
+   (if(item.get.contains(term,true)) 3 else 0)+
+   (if(item.recipe.contains(term,true)) 3 else 0)
+  }+tokens.sumOf{if(item.name.contains(it,true)) 3 else if(item.use.contains(it,true)||item.get.contains(it,true)) 1 else 0}
+  item to score
+ }.filter{it.second>0}.sortedByDescending{it.second}.take(10).map{it.first}
  if(matches.isNotEmpty()) matches.take(8).forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}\n配方：${it.recipe}")}
  if(listOf("新手","開始","初期","生存","優先").any{q.contains(it)}){
   add("新手起步","先準備淨水器與烤架維持飲水和食物，再製作建築錘擴建木筏、放置收集網、研究桌，逐步解鎖設備。")
@@ -359,7 +391,7 @@ private fun answerRaftQuestion(question:String):String{
   val found=data.filter{item->tokens.any{t->item.name.contains(t,true)||item.en.contains(t,true)||item.use.contains(t,true)||item.get.contains(t,true)}}.take(6)
   found.forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}")}
  }
- if(out.isEmpty()) return "目前離線百科找不到足夠資料回答「$q」。你可以改問物品名稱、材料用途、料理、動物、藍圖、故事島嶼或新手玩法。這個版本是本機知識庫助手，並非連線大型語言模型，因此不會假裝能回答資料庫以外的所有問題。"
+ if(out.isEmpty()) return "我目前在離線資料庫中找不到足夠可靠的答案：「$q」。你可以試著換成物品名稱、材料、設備、料理、動物、藍圖或故事地點等關鍵字。這個助手會優先列出資料庫有根據的內容，不會把猜測當成遊戲事實。若要回答資料庫以外的最新或複雜問題，仍需要連線式 AI 服務。"
  return "根據 App 目前整理的 Raft 知識庫：\n\n"+out.distinct().take(14).joinToString("\n\n")+"\n\n提醒：若遊戲版本或存檔內容不同，請以遊戲內資訊為準。"
 }
 
@@ -369,13 +401,15 @@ fun GuideApp(){
  var mode by remember{mutableStateOf("一般模式")}
  var page by remember{mutableStateOf("物品百科")}
  var query by remember{mutableStateOf("")}
+ var debouncedQuery by remember{mutableStateOf("")}
+ LaunchedEffect(query){delay(180);debouncedQuery=query}
  var aiQuestion by remember{mutableStateOf("")}
  var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 指南內建百科助手。可以問我材料用途、設備、料理、動物、藍圖、島嶼與新手玩法。")}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
  val categories=listOf("全部")+data.map{it.cat}.distinct()
- val filtered=remember(mode,category,query){data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}}
+ val filtered=remember(mode,category,debouncedQuery){data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
  bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
@@ -392,7 +426,7 @@ fun GuideApp(){
  val list=if(page=="收藏")data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}else filtered
  Text("目前顯示 "+list.size+" 項",color=MaterialTheme.colorScheme.primary)
  LazyColumn(verticalArrangement=Arrangement.spacedBy(7.dp),contentPadding=PaddingValues(bottom=28.dp)){
- items(list){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
+ items(list,key={it.name+it.cat}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
  Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
