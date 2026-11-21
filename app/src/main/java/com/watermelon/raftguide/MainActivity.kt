@@ -411,17 +411,22 @@ private fun answerRaftQuestion(question:String):String{
  )
  val expanded=(listOf(q)+aliases.filterKeys{q.contains(it)}.values.flatten()).distinct()
  val tokens=q.split(Regex("[，。！？、？\\s]+")).filter{it.length>=1}
- val matches=data.map{item->
-  val score=expanded.sumOf{term->
-   (if(item.name.contains(term,true)) 12 else 0)+
-   (if(item.en.contains(term,true)) 7 else 0)+
-   (if(item.cat.contains(term,true)) 5 else 0)+
-   (if(item.use.contains(term,true)) 4 else 0)+
-   (if(item.get.contains(term,true)) 3 else 0)+
-   (if(item.recipe.contains(term,true)) 3 else 0)
-  }+tokens.sumOf{if(item.name.contains(it,true)) 3 else if(item.use.contains(it,true)||item.get.contains(it,true)) 1 else 0}
-  item to score
- }.filter{it.second>0}.sortedByDescending{it.second}.take(10).map{it.first}
+ val matches:List<RaftItem> = data.map { item:RaftItem ->
+   var score=0
+   for(term in expanded){
+    if(item.name.contains(term,true)) score+=12
+    if(item.en.contains(term,true)) score+=7
+    if(item.cat.contains(term,true)) score+=5
+    if(item.use.contains(term,true)) score+=4
+    if(item.get.contains(term,true)) score+=3
+    if(item.recipe.contains(term,true)) score+=3
+   }
+   for(token in tokens){
+    if(item.name.contains(token,true)) score+=3
+    else if(item.use.contains(token,true)||item.get.contains(token,true)) score+=1
+   }
+   Pair(item,score)
+  }.filter{pair->pair.second>0}.sortedByDescending{pair->pair.second}.take(10).map{pair->pair.first}
  if(matches.isNotEmpty()) matches.take(8).forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}\n配方：${it.recipe}")}
  if(listOf("新手","開始","初期","生存","優先").any{q.contains(it)}){
   add("新手起步","先準備淨水器與烤架維持飲水和食物，再製作建築錘擴建木筏、放置收集網、研究桌，逐步解鎖設備。")
