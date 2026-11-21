@@ -1,4 +1,4 @@
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.8-flash";
 
 const SYSTEM_RULES = `
 你是「RAFT 指南」的專用遊戲百科助理，只能回答電腦遊戲《Raft》（木筏求生）本身的內容。
