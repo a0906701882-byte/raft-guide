@@ -1,6 +1,11 @@
 package com.watermelon.raftguide
 
 import android.os.Bundle
+import android.content.Context
+import java.net.HttpURLConnection
+import java.net.URL
+import org.json.JSONObject
+import org.json.JSONArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -13,11 +18,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
 private val data = listOf(
@@ -404,7 +413,15 @@ fun GuideApp(){
  var debouncedQuery by remember{mutableStateOf("")}
  LaunchedEffect(query){delay(180);debouncedQuery=query}
  var aiQuestion by remember{mutableStateOf("")}
- var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 指南內建百科助手。可以問我材料用途、設備、料理、動物、藍圖、島嶼與新手玩法。")}
+ var aiEndpoint by remember{mutableStateOf("")}
+ var aiLoading by remember{mutableStateOf(false)}
+ var aiAnswer by remember{mutableStateOf("請先設定雲端 AI 網址，再開始詢問 Raft 遊戲問題。")}
+ var aiSources by remember{mutableStateOf(emptyList<Pair<String,String>>())}
+ val aiHistory=remember{mutableStateListOf<Pair<String,String>>()}
+ val aiScope=rememberCoroutineScope()
+ val appContext=LocalContext.current
+ LaunchedEffect(Unit){aiEndpoint=appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).getString("ai_endpoint","")?:""}
+ LaunchedEffect(aiEndpoint){appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).edit().putString("ai_endpoint",aiEndpoint.trim()).apply()}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
@@ -454,18 +471,49 @@ fun GuideApp(){
  }else if(page=="AI問答"){
  Column(Modifier.fillMaxSize(),verticalArrangement=Arrangement.spacedBy(10.dp)){
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
-   Text("🤖 RAFT 遊戲百科助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-   Text("離線知識庫問答：搜尋本 App 已整理的物品、料理、動物、藍圖、島嶼與新手指南。遇到資料庫沒有的問題，我會明確告訴你，不會亂編。",style=MaterialTheme.typography.bodyMedium)
+   Text("🤖 RAFT 專用 AI 助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+   Text("連線式生成 AI，只回答《Raft》遊戲內容；可搜尋遊戲資料並接續追問。",style=MaterialTheme.typography.bodyMedium)
   }}
-  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入你的 Raft 問題")},placeholder={Text("例如：電池怎麼充電？哪裡找鈦礦？")},minLines=2)
-  Button(onClick={aiAnswer=answerRaftQuestion(aiQuestion)},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("詢問 RAFT 助手")}
+  OutlinedTextField(value=aiEndpoint,onValueChange={aiEndpoint=it},modifier=Modifier.fillMaxWidth(),label={Text("雲端 AI 網址")},placeholder={Text("部署完成後貼上 Worker 網址")},singleLine=true)
+  Text("網址會保存在這台手機；API 金鑰只放在雲端伺服器，不要貼在這裡。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 遊戲問題")},placeholder={Text("例如：如何建立自動灑水農場？")},minLines=2)
+  Button(onClick={
+   val q=aiQuestion.trim()
+   if(aiEndpoint.startsWith("https://")&&q.isNotBlank()&&!aiLoading){
+    aiLoading=true
+    aiAnswer="正在搜尋 Raft 遊戲資料並整理答案…"
+    aiSources=emptyList()
+    aiScope.launch{
+     try{
+      val (answer,sources)=requestRaftAi(aiEndpoint,q,aiHistory.toList())
+      aiHistory.add("使用者" to q)
+      aiHistory.add("AI" to answer)
+      while(aiHistory.size>10)aiHistory.removeAt(0)
+      aiAnswer=answer
+      aiSources=sources
+      aiQuestion=""
+     }catch(e:Exception){aiAnswer="連線失敗：${e.message?: "請檢查雲端網址與網路"}"}
+     finally{aiLoading=false}
+    }
+   }else if(!aiEndpoint.startsWith("https://")){aiAnswer="請先填入已部署的 HTTPS 雲端 AI 網址。"}
+  },enabled=aiQuestion.isNotBlank()&&!aiLoading,modifier=Modifier.fillMaxWidth()){
+   Text(if(aiLoading)"正在搜尋…" else "詢問 RAFT AI")
+  }
+  if(aiLoading)LinearProgressIndicator(Modifier.fillMaxWidth())
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-   Text("回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+   Text("AI 回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
    Text(aiAnswer)
+   if(aiSources.isNotEmpty()){
+    HorizontalDivider()
+    Text("參考來源",fontWeight=FontWeight.Bold)
+    aiSources.forEach{source->TextButton(onClick={
+     try{appContext.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,android.net.Uri.parse(source.second)))}
+     catch(_:Exception){}
+    }){Text(source.first,maxLines=2)}}
+   }
   }}
-  Text("試試看：",fontWeight=FontWeight.Bold)
-  listOf("怎麼製作料理？","動物怎麼照顧？","故事島嶼有哪些？","藍圖有什麼用途？","木筏初期要先做什麼？").forEach{q->
-   OutlinedButton(onClick={aiQuestion=q;aiAnswer=answerRaftQuestion(q)},modifier=Modifier.fillMaxWidth()){Text(q)}
+  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+   OutlinedButton(onClick={aiHistory.clear();aiSources=emptyList();aiAnswer="已清除這次對話。"}){Text("清除對話")}
   }
  }
  }else if(page=="料理"){
