@@ -337,6 +337,8 @@ private val recipeInfo = listOf(
 class MainActivity:ComponentActivity(){
  override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{GuideApp()}}
 }
+private const val DEFAULT_RAFT_AI_ENDPOINT = "https://raft-guide-ai.raft-guide-a0906701882.workers.dev"
+
 @OptIn(ExperimentalMaterial3Api::class)
 
 private suspend fun requestRaftAi(endpoint:String, question:String, history:List<Pair<String,String>>):Pair<String,List<Pair<String,String>>> = withContext(Dispatchers.IO) {
@@ -456,7 +458,7 @@ fun GuideApp(){
  val aiHistory=remember{mutableStateListOf<Pair<String,String>>()}
  val aiScope=rememberCoroutineScope()
  val appContext=LocalContext.current
- LaunchedEffect(Unit){aiEndpoint=appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).getString("ai_endpoint","")?:""}
+ LaunchedEffect(Unit){val saved=appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).getString("ai_endpoint","")?:"";aiEndpoint=if(saved.startsWith("https://"))saved else DEFAULT_RAFT_AI_ENDPOINT}
  LaunchedEffect(aiEndpoint){appContext.getSharedPreferences("raft_guide",Context.MODE_PRIVATE).edit().putString("ai_endpoint",aiEndpoint.trim()).apply()}
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
@@ -510,8 +512,7 @@ fun GuideApp(){
    Text("🤖 RAFT 專用 AI 助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
    Text("連線式生成 AI，只回答《Raft》遊戲內容；可搜尋遊戲資料並接續追問。",style=MaterialTheme.typography.bodyMedium)
   }}
-  OutlinedTextField(value=aiEndpoint,onValueChange={aiEndpoint=it},modifier=Modifier.fillMaxWidth(),label={Text("雲端 AI 網址")},placeholder={Text("部署完成後貼上 Worker 網址")},singleLine=true)
-  Text("網址會保存在這台手機；API 金鑰只放在雲端伺服器，不要貼在這裡。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+  Text("已自動連接雲端 RAFT AI；不用手動輸入網址。API 金鑰安全地保存在雲端。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
   OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 遊戲問題")},placeholder={Text("例如：如何建立自動灑水農場？")},minLines=2)
   Button(onClick={
    val q=aiQuestion.trim()
@@ -528,7 +529,7 @@ fun GuideApp(){
       aiAnswer=answer
       aiSources=sources
       aiQuestion=""
-     }catch(e:Exception){aiAnswer="連線失敗：${e.message?: "請檢查雲端網址與網路"}"}
+     }catch(e:Exception){val offline=answerRaftQuestion(q);aiAnswer="雲端 AI 暫時無法連線（${e.message?: "請檢查網路"}）。以下先提供 App 離線資料庫內容：\n\n"+offline}
      finally{aiLoading=false}
     }
    }else if(!aiEndpoint.startsWith("https://")){aiAnswer="請先填入已部署的 HTTPS 雲端 AI 網址。"}
