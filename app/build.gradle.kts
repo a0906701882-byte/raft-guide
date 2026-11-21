@@ -21,6 +21,13 @@ android {
         jvmTarget = "17"
     }
     buildFeatures { compose = true }
+    buildTypes {
+        release {
+            // 個人測試版使用 Android Gradle Plugin 的 debug 簽章，方便直接安裝。
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+        }
+    }
 }
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.12.01"))
