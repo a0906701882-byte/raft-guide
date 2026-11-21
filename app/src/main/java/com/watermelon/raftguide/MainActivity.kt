@@ -452,7 +452,7 @@ fun GuideApp(){
  var selectedIsland by remember{mutableStateOf<Pair<String,String>?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
  val categories=remember{listOf("全部")+data.map{it.cat}.distinct()}
- val filtered=remember(mode,category,debouncedQuery){data.filter{(debouncedQuery.isNotBlank()||mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
+ val filtered=remember(mode,category,debouncedQuery){data.filter{(debouncedQuery.isNotBlank()||mode=="創造模式"||(it.cat!="創造模式雜項"&&!it.creativeOnly))&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
  val favoriteItems=remember(favorites,query){data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
