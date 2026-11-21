@@ -129,7 +129,10 @@ export default {
     } catch (error) {
       return json({
         error: "AI 服務暫時無法使用，請稍後再試。",
-        detail: String(error?.message || error).slice(0, 240),
+        detail: (String(error?.message || error).slice(0, 240) +
+          (error?.googleError?.details?.length
+            ? " | API 配額資訊：" + JSON.stringify(error.googleError.details).slice(0, 1400)
+            : "")),
         googleHttpStatus: error?.httpStatus || null,
         googleErrorCode: error?.googleError?.code || null,
         quotaDetails: error?.googleError?.details || []
