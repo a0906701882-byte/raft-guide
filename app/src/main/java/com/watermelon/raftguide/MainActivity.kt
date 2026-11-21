@@ -217,18 +217,45 @@ RaftItem("舊鞋","Old Shoe","創造模式雜項","👞","趣味收集物。","�
 RaftItem("收音機","Radio","創造模式雜項","📻","播放遊戲音樂。","創造模式物品清單。","裝飾與音樂用途。",true),
 RaftItem("鋼琴","Piano","創造模式雜項","🎹","可演奏音樂。","創造模式物品清單。","互動裝飾。",true),
 RaftItem("錄音帶","Cassette Tapes","創造模式雜項","📼","音樂收藏。","探索或創造模式物品清單。","收藏用途。",true),
+RaftItem("進階電池","Advanced Battery","電力設備","🔋","供應設備較長時間的電力。","取得藍圖並研究解鎖。","依遊戲內配方表。"),
+RaftItem("水壺","Canteen","容器","🫗","攜帶飲用水。","取得藍圖或研究解鎖。","依遊戲內配方表。"),
+RaftItem("床","Bed","家具","🛏️","木筏上的休息家具。","製作選單或研究解鎖。","依遊戲內配方表。"),
+RaftItem("簡易床","Simple Bed","家具","🛏️","休息並設定重生點。","製作選單製作。","依遊戲內配方表。"),
+RaftItem("生質燃料槽","Biofuel Tank","燃料設備","🛢️","儲存生質燃料。","取得藍圖並研究解鎖。","搭配燃料管線使用。"),
+RaftItem("金屬魚竿","Metal Fishing Rod","工具","🎣","釣魚用具。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("高級魚竿","Metal Fishing Rod","工具","🎣","釣魚用具。","研究解鎖後製作。","依遊戲內配方表。"),
+RaftItem("空水壺","Canteen","容器","🫗","攜帶飲用水。","製作或藍圖解鎖。","依遊戲內配方表。"),
+RaftItem("裝飾木板","Detail Plank","建築裝飾","🪵","調整木筏建築外觀細節。","藍圖解鎖或裝飾內容取得。","建築裝飾用途。"),
+RaftItem("電動滑索工具","Electric Zipline Tool","交通設備","🚡","沿滑索移動。","藍圖解鎖後製作。","依遊戲內配方表。"),
+RaftItem("高級電池","Advanced Battery","電力設備","🔋","為設備供電。","藍圖解鎖後製作。","依遊戲內配方表。"),
+RaftItem("黑色花","Black Flower","植物材料","🌺","裝飾與顏料材料。","島嶼採集或種植。","可用於顏料相關用途。"),
+RaftItem("藍色花","Blue Flower","植物材料","🌼","裝飾與顏料材料。","島嶼採集或種植。","可用於顏料相關用途。"),
+RaftItem("紅色花","Red Flower","植物材料","🌺","裝飾與顏料材料。","島嶼採集或種植。","可用於顏料相關用途。"),
+RaftItem("白色花","White Flower","植物材料","🌼","裝飾與顏料材料。","島嶼採集或種植。","可用於顏料相關用途。"),
+RaftItem("黃色花","Yellow Flower","植物材料","🌻","裝飾與顏料材料。","島嶼採集或種植。","可用於顏料相關用途。"),
+RaftItem("蠟燭瓶","Candle Bottle","裝飾","🕯️","室內裝飾照明。","探索或裝飾內容取得。","裝飾用途。"),
+RaftItem("唐加羅瓦畫作","Tangaroa Painting","裝飾","🖼️","故事地點主題收藏裝飾。","探索唐加羅瓦取得。","收藏用途。"),
+RaftItem("開發者畫作","Developer Paintings","裝飾","🖼️","特殊收藏裝飾。","特殊遊戲內容取得。","收藏用途。"),
+RaftItem("機械鴨","Scrap Mechanic Duck","收藏品","🦆","特殊收藏裝飾。","探索或特殊內容取得。","收藏用途。"),
+RaftItem("剩菜","Leftovers","食物","🥣","料理失敗或不符合食譜時取得。","料理鍋製作結果。","依食譜卡正確放入材料可製成指定料理。"),
+RaftItem("紅莓果汁材料","Pineberry","食物","🍓","果汁材料。","島嶼探索取得。","依榨汁機食譜卡使用。"),
+RaftItem("魚類料理材料","魚類食材","食物","🐟","料理鍋食譜常用材料。","釣魚取得。","依遊戲內食譜卡片核對種類與份量。"),
 )
 private val islands = listOf(
-"小島" to "採集樹木、椰子與其他植物；在島嶼周圍海底尋找礦物、沙子與黏土。",
-"大型島嶼" to "探索高處、洞穴與海岸，留意作物、特殊材料及交易站。",
-"無線電塔" to "依接收器訊號尋找故事地點，探索建築並閱讀筆記。",
-"瓦薩加坦" to "故事探索地點之一，仔細搜尋房間、線索與筆記。",
-"巴爾博亞島" to "森林型故事島，探索步道與研究設施。",
-"商隊小鎮" to "探索水下與聚落設施，可找到故事線索及特殊物資。",
-"唐加羅瓦" to "大型故事地點，探索建築、地下區域與城市設施。",
-"瓦魯納角" to "故事章節地點，探索水下建築與周邊區域。",
-"坦佩雷斯" to "冰雪地區故事地點，探索設施並收集故事線索。",
-"烏托邦" to "故事後期地點，依線索逐步探索各區域。"
+"小型島嶼" to "常見植物與海岸資源區。可留意棕櫚樹、作物與周圍淺海資源。",
+"大型島嶼" to "有較多地形與生態區域，可能找到動物、洞穴、埋藏物及多種資源。",
+"稀有島嶼" to "特殊外觀或特殊資源的探索地點，內容可能隨世界生成而異。",
+"無線電塔 Radio Tower" to "第一章故事地點。可找到故事筆記、藍圖與後續頻率線索。",
+"瓦薩加坦 Vasagatan" to "第一章故事地點。以船舶內部探索、筆記與藍圖收集為主。",
+"巴爾博亞島 Balboa Island" to "第一章故事地點。森林環境，包含步道、研究設施與故事線索。",
+"商隊小鎮 Caravan Town" to "第二章故事地點。探索聚落、水下區域與各處線索。",
+"唐加羅瓦 Tangaroa" to "第二章故事地點。大型人工城市區域，包含代幣、筆記與收藏。",
+"瓦魯納角 Varuna Point" to "第三章故事地點。水下建築與多層探索區域，留意筆記及藍圖。",
+"坦佩雷斯 Temperance" to "第三章故事地點。冰雪環境，包含研究設施、交通設施與故事線索。",
+"烏托邦 Utopia" to "第三章最終故事地點。包含多個區域、謎題與故事收尾內容。",
+"交易站 Trading Post" to "大型島嶼可能出現的交易設施，可使用交易貨幣兌換商品與特殊食譜。",
+"水下珊瑚礁" to "島嶼周圍的水下探索區域，可找到沙子、黏土、礦石及其他海洋材料。",
+"廢棄木筏" to "海上探索地點之一，可能找到補給與食譜線索。"
 )
 
 
@@ -239,30 +266,61 @@ private val animalInfo = listOf(
 "蜜蜂 Bee" to "在適合的島嶼區域可捕捉，蜂箱周圍需有花朵才能生產蜂蜜。",
 "海鷗 Seagull" to "可能停留在鳥巢附近；留意種植區作物的保護。"
 )
+private val blueprintInfo = listOf(
+"Advanced Battery" to "進階電池藍圖：解鎖較高階的電力儲存設備。",
+"Advanced Biofuel Refiner" to "進階生質燃料精煉器藍圖：解鎖燃料加工設備。",
+"Advanced Head Light" to "進階頭燈藍圖：解鎖照明裝備。",
+"Advanced Large Crop Plot" to "進階大型種植箱藍圖：解鎖大型種植設備。",
+"Advanced Medium Crop Plot" to "進階中型種植箱藍圖：解鎖中型種植設備。",
+"Advanced Small Crop Plot" to "進階小型種植箱藍圖：解鎖小型種植設備。",
+"Advanced Stationary Anchor" to "進階固定式錨藍圖：解鎖固定木筏設備。",
+"Antenna" to "天線藍圖：接收器定位系統的組件。",
+"Battery Charger" to "電池充電器藍圖：解鎖電池充電設備。",
+"Big Backpack" to "大型背包藍圖：解鎖容量較大的背包。",
+"Biofuel Refiner" to "生質燃料精煉器藍圖：解鎖燃料加工設備。",
+"Canteen" to "水壺藍圖：解鎖便攜式飲水容器。",
+"Detail Plank" to "細節木板藍圖：解鎖建築外觀細節。",
+"Electric Grill" to "電動烤架藍圖：解鎖電力烹飪設備。",
+"Electric Purifier" to "電動淨水器藍圖：解鎖電力淨水設備。",
+"Electric Smelter" to "電動熔爐藍圖：解鎖電力加工設備。",
+"Electric Zipline Tool" to "電動滑索工具藍圖：解鎖滑索交通裝備。",
+"Engine" to "引擎藍圖：解鎖木筏動力設備。",
+"Engine Controls" to "引擎控制器藍圖：集中控制引擎。",
+"Fuel Pipe" to "燃料管藍圖：解鎖燃料輸送管線。",
+"Fuel Tank" to "燃料槽藍圖：解鎖燃料儲存設備。",
+"Head Light" to "頭燈藍圖：解鎖照明裝備。",
+"Large Storage" to "大型儲物箱藍圖：解鎖大型收納設備。",
+"Metal Detector" to "金屬探測器藍圖：解鎖探索用探測設備。",
+"Receiver" to "接收器藍圖：解鎖故事訊號定位設備。",
+"Recycler" to "回收機藍圖：解鎖資源回收設備。",
+"Steering Wheel" to "方向盤藍圖：解鎖木筏方向控制設備。",
+"Water Pipe" to "水管藍圖：解鎖水路輸送設備。",
+"Water Tank" to "水箱藍圖：解鎖淡水儲存設備。",
+"Wind Turbine" to "風力發電機藍圖：解鎖風力供電設備。",
+"Zipline" to "滑索藍圖：解鎖滑索設施。",
+"Zipline Tool" to "滑索工具藍圖：解鎖滑索移動裝備。"
+)
 private val recipeInfo = listOf(
-"燒烤拼盤 BBQ" to "料理鍋料理。依遊戲內食譜卡片確認食材與份量。",
-"鯰魚豪華餐 Catfish Deluxe" to "料理鍋料理。依食譜卡片準備鯰魚與指定配料。",
-"椰子雞 Coconut Chicken" to "料理鍋料理。依食譜卡片準備椰子與指定配料。",
-"果醬雞腿 Drumstick with Jam" to "料理鍋料理。依食譜卡片準備雞腿與指定配料。",
-"魚湯 Fish Stew" to "料理鍋料理。依食譜卡片準備魚類與指定配料。",
-"水果什錦 Fruit Compot" to "料理鍋料理。依食譜卡片準備水果。",
-"頭骨濃湯 Head Broth" to "料理鍋料理。依食譜卡片準備指定食材。",
-"豐盛燉菜 Hearty Stew" to "料理鍋料理。依食譜卡片準備指定食材。",
-"蘑菇煎蛋 Mushroom Omelette" to "料理鍋料理。依食譜卡片準備蘑菇與蛋。",
-"鮭魚沙拉 Salmon Salad" to "料理鍋料理。依食譜卡片準備鮭魚與蔬菜。",
-"鯊魚晚餐 Shark Dinner" to "料理鍋料理。依食譜卡片確認指定食材。",
-"簡易魚湯 Simple Fish Stew" to "料理鍋料理。依食譜卡片準備魚類與蔬菜。",
-"果醬牛排 Steak with Jam" to "料理鍋料理。依食譜卡片準備指定食材。",
-"壽司 Sushi" to "料理鍋料理。依食譜卡片準備魚類與配料。",
-"蔬菜湯 Vegetable Soup" to "料理鍋料理。依食譜卡片準備蔬菜。",
-"簡易冰沙 Simple Smoothie" to "榨汁機飲品。依食譜卡片準備指定水果。",
-"椰子甜菜飲 Coconut Beat" to "榨汁機飲品。依食譜卡片準備椰子與甜菜根。",
-"芒果香蕉汁 Mangonana" to "榨汁機飲品。依食譜卡片準備水果。",
-"紅色西瓜汁 Red Melon" to "榨汁機飲品。依食譜卡片準備西瓜與指定配料。",
-"甜菜根特調 Redbeet Shot" to "榨汁機飲品。依食譜卡片準備甜菜根。",
-"銀色冰沙 Silver Smoothie" to "榨汁機飲品。依食譜卡片準備指定材料。",
-"香辣鳳梨莓果飲 Spicy Pineberry" to "榨汁機飲品。依食譜卡片準備指定材料。",
-"草莓可樂達 Strawberry Colada" to "榨汁機飲品。依食譜卡片準備草莓與指定材料。"
+"BBQ 燒烤拼盤" to "料理鍋食譜。食材與數量請依遊戲內 Recipe: BBQ 卡片確認。",
+"Catfish Deluxe 鯰魚豪華餐" to "料理鍋食譜。高級料理；依食譜卡片準備鯰魚與指定食材。",
+"Coconut Chicken 椰子雞" to "料理鍋食譜。依食譜卡片確認椰子與其他材料份量。",
+"Head Broth 頭骨濃湯" to "料理鍋食譜。依食譜卡片確認指定材料。",
+"Hearty Stew 豐盛燉菜" to "料理鍋食譜。特殊效果料理；依食譜卡片確認材料。",
+"Mushroom Omelette 蘑菇煎蛋" to "料理鍋食譜。依食譜卡片確認蘑菇與其他材料份量。",
+"Salmon Salad 鮭魚沙拉" to "料理鍋食譜。高級料理；依食譜卡片確認材料。",
+"Shark Dinner 鯊魚晚餐" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"Simple Fish Stew 簡易魚湯" to "料理鍋食譜。依食譜卡片確認可替換食材與份量。",
+"Steak with Jam 果醬牛排" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"Sushi 壽司" to "料理鍋食譜。依食譜卡片確認材料與份量。",
+"Vegetable Soup 蔬菜湯" to "料理鍋食譜。蔬菜可依食譜卡片允許的組合替換。",
+"Coconut Beat 椰子甜菜飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Mangonana 芒果香蕉汁" to "榨汁機食譜。依食譜卡片確認水果與份量。",
+"Red Melon 紅色西瓜汁" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Redbeet Shot 甜菜根特調" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Silver Smoothie 銀色冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Simple Smoothie 簡易冰沙" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Spicy Pineberry 香辣鳳梨莓果飲" to "榨汁機食譜。依食譜卡片確認材料與份量。",
+"Strawberry Colada 草莓可樂達" to "榨汁機食譜。依食譜卡片確認材料與份量。"
 )
 
 class MainActivity:ComponentActivity(){
@@ -281,7 +339,7 @@ fun GuideApp(){
  val filtered=data.filter{(mode=="創造模式"||!it.creativeOnly)&&(category=="全部"||it.cat==category)&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true)||it.use.contains(query,true))}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
- bottomBar={NavigationBar{listOf("物品百科","收藏","料理","動物","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"料理"->"🍲";"動物"->"🐾";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
+ bottomBar={NavigationBar{listOf("物品百科","收藏","料理","動物","藍圖","新手指南","島嶼").forEach{p->NavigationBarItem(selected=page==p,onClick={page=p;chosen=null},icon={Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"})},label={Text(p)})}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -328,6 +386,8 @@ fun GuideApp(){
  LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){
  items(animalInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🐾 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
+ }else if(page=="藍圖"){
+ LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){items(blueprintInfo){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("📜 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}}
  }else if(page=="新手指南"){
  val tips=listOf("先維持生存" to "優先收集木板、塑膠與棕櫚葉，準備淨水器與烤架。","擴大木筏" to "在木筏外圍設置收集網，定期整理收集到的物資。","研究材料" to "製作研究桌，投入新材料逐步解鎖製作項目。","探索島嶼" to "靠近島嶼後固定木筏，探索陸地與水下並留意補給。","建立農場" to "使用種植箱種植作物，準備草地區照顧可飼養動物。","尋找故事地點" to "製作接收器與天線，依螢幕訊號探索故事地點。","管理資源" to "將材料分類存放，保留木板作為燃料與修理用途。")
  LazyColumn(verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=12.dp)){items(tips){tip->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp)){Text(tip.first,fontWeight=FontWeight.Bold);Text(tip.second)}}}}
