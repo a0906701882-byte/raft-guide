@@ -483,7 +483,7 @@ fun GuideApp(){
  if(chosen==null){
  val list=if(page=="收藏")favoriteItems else filtered
  Text("目前顯示 "+list.size+" 項",color=MaterialTheme.colorScheme.primary)
- LazyColumn(verticalArrangement=Arrangement.spacedBy(7.dp),contentPadding=PaddingValues(bottom=28.dp)){
+ LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
  items(list,key={it.name+it.cat}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
