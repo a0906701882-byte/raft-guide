@@ -1,8 +1,10 @@
 package com.watermelon.raftguide
 
 import android.os.Bundle
-import android.content.Intent
-import android.net.Uri
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
+import org.json.JSONObject
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -23,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Immutable
 data class RaftItem(val name:String,val en:String,val cat:String,val icon:String,val use:String,val get:String,val recipe:String,val creativeOnly:Boolean=false)
@@ -439,17 +443,73 @@ private fun answerRaftQuestion(question:String):String{
  return "根據 App 目前整理的 Raft 知識庫：\n\n"+out.distinct().take(14).joinToString("\n\n")+"\n\n提醒：若遊戲版本或存檔內容不同，請以遊戲內資訊為準。"
 }
 
+private suspend fun searchRaftOnline(question:String):String = withContext(Dispatchers.IO) {
+ try {
+  fun get(url:String):String {
+   val connection=(URL(url).openConnection() as HttpURLConnection)
+   connection.requestMethod="GET"
+   connection.connectTimeout=10000
+   connection.readTimeout=12000
+   connection.setRequestProperty("User-Agent","RAFT-Guide-Android/1.0")
+   return try { connection.inputStream.bufferedReader().use{it.readText()} }
+   finally { connection.disconnect() }
+  }
+  val encoded=URLEncoder.encode(question,"UTF-8")
+  val searchUrl="https://raft.fandom.com/api.php?action=query&list=search&srsearch=$encoded&format=json&utf8=1&srlimit=5"
+  val searchJson=JSONObject(get(searchUrl))
+  val results=searchJson.optJSONObject("query")?.optJSONArray("search")
+  if(results==null||results.length()==0) return@withContext "目前無法從線上百科找到相關內容。你仍可參考 App 內建資料。"
+  val pageIds=mutableListOf<String>()
+  val titles=mutableListOf<String>()
+  for(i in 0 until minOf(results.length(),4)){
+   val item=results.getJSONObject(i)
+   pageIds.add(item.optString("pageid"))
+   titles.add(item.optString("title"))
+  }
+  val extracts=try {
+   val ids=URLEncoder.encode(pageIds.joinToString("|"),"UTF-8")
+   val detailUrl="https://raft.fandom.com/api.php?action=query&prop=extracts&exintro=1&explaintext=1&pageids=$ids&format=json"
+   val pages=JSONObject(get(detailUrl)).optJSONObject("query")?.optJSONObject("pages")
+   val details=mutableListOf<String>()
+   if(pages!=null){
+    val keys=pages.keys()
+    while(keys.hasNext()){
+     val page=pages.getJSONObject(keys.next())
+     val extract=page.optString("extract").trim()
+     if(extract.isNotBlank()) details.add(extract.take(650))
+    }
+   }
+   details
+  } catch(_:Exception){ emptyList<String>() }
+  val combined=if(extracts.isNotEmpty()) extracts.take(3).joinToString("\\n\\n") else {
+   (0 until minOf(results.length(),3)).mapNotNull{i->
+    val snippet=results.getJSONObject(i).optString("snippet")
+     .replace(Regex("<[^>]*>")," ")
+     .replace("&quot;","\\\"").replace("&amp;","&").replace("&#039;","'")
+     .replace("&lt;","<").replace("&gt;",">").replace("&nbsp;"," ")
+     .replace(Regex("\\s+")," ").trim()
+    if(snippet.isBlank()) null else snippet
+   }.joinToString("\\n\\n")
+  }
+  if(combined.isBlank()) "已連線，但這個問題暫時沒有取得可用的文字內容。請換個關鍵字再試一次。"
+  else "線上補充資料：\\n\\n"+combined
+ } catch(_:Exception) {
+  "目前無法連線取得線上資料，請確認網路後再試。App 內建百科仍可提供已收錄的答案。"
+ }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuideApp(){
-  val context=LocalContext.current
  var mode by remember{mutableStateOf("一般模式")}
  var page by remember{mutableStateOf("物品百科")}
  var query by remember{mutableStateOf("")}
  var debouncedQuery by remember{mutableStateOf("")}
  LaunchedEffect(query){delay(180);debouncedQuery=query}
  var aiQuestion by remember{mutableStateOf("")}
- var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 離線智慧助手。可以問我物品用途、材料取得、製作設備、料理、動物、研究、島嶼與新手生存。")}
+ var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 智慧助手。輸入問題後，我會整理 App 百科並嘗試連線補充相關資料。")}
+ var aiSearching by remember{mutableStateOf(false)}
+ val scope=rememberCoroutineScope()
  var category by remember{mutableStateOf("全部")}
  var chosen by remember{mutableStateOf<RaftItem?>(null)}
  var selectedBlueprint by remember{mutableStateOf<Pair<String,String>?>(null)}
@@ -511,22 +571,28 @@ fun GuideApp(){
   Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)){
    Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
     Text("📚 RAFT 智慧問答",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-    Text("先搜尋 App 內的物品百科、料理、動物、藍圖與島嶼資料；也可連線開啟外部遊戲資料來源查找最新內容。",style=MaterialTheme.typography.bodyMedium)
-    Text("外部資料由瀏覽器開啟，需網路連線；不會假裝已讀取未開啟的網頁。",style=MaterialTheme.typography.bodySmall)
+    Text("輸入問題後，直接在這裡查看整理好的答案。",style=MaterialTheme.typography.bodyMedium)
    }}
    OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 問題")},placeholder={Text("例如：大型島嶼有哪些資源？")},minLines=2)
-   Button(onClick={val q=aiQuestion.trim();if(q.isNotBlank()){aiAnswer=answerRaftQuestion(q);aiQuestion=""}},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("搜尋 App 百科資料")}
-   OutlinedButton(onClick={val q=aiQuestion.trim();if(q.isNotBlank()){val url="https://www.google.com/search?q="+Uri.encode("Raft game $q site:raft.fandom.com OR site:steamcommunity.com OR site:reddit.com/r/RaftTheGame");context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))}},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("連線搜尋各大 Raft 資訊平台")}
-   Text("常用資訊來源",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
-   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
-    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://raft.fandom.com/wiki/Raft_Wiki")))},modifier=Modifier.weight(1f)){Text("RAFT 百科")}
-    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://steamcommunity.com/app/648800/guides/")))},modifier=Modifier.weight(1f)){Text("Steam 攻略")}
+   Button(onClick={
+    val q=aiQuestion.trim()
+    if(q.isNotBlank()&&!aiSearching){
+     aiSearching=true
+     aiQuestion=""
+     scope.launch{
+      val local=answerRaftQuestion(q)
+      val online=searchRaftOnline(q)
+      aiAnswer=local+"\\n\\n"+online
+      aiSearching=false
+     }
+    }
+   },enabled=aiQuestion.isNotBlank()&&!aiSearching,modifier=Modifier.fillMaxWidth()){
+    Text(if(aiSearching)"正在整理答案…" else "送出問題")
    }
-   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
-    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://www.reddit.com/r/RaftTheGame/")))},modifier=Modifier.weight(1f)){Text("玩家社群")}
-    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://www.redbeetinteractive.com/")))},modifier=Modifier.weight(1f)){Text("開發團隊")}
-   }
-   Card(Modifier.weight(1f,true).fillMaxWidth()){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){Text("App 百科搜尋結果",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary);Text(aiAnswer)}}
+   Card(Modifier.weight(1f,true).fillMaxWidth()){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+    Text(if(aiSearching)"正在查找並整理答案" else "回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+    Text(aiAnswer)
+   }}
   }
  }else if(page=="料理"){
  }else if(page=="料理"){
