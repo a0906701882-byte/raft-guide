@@ -478,7 +478,7 @@ fun GuideApp(){
   Text("目前顯示 ${list.size} 項",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.primary)
 
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
- items(list,key={it.name+it.cat},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
+ items(list,key={index,item->"${item.name}_${item.en}_${index}"},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
  Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
@@ -596,7 +596,7 @@ fun GuideApp(){
    TextButton(onClick={selectedMaterials=emptySet()}){Text("清空清單")}
   }
   LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp),contentPadding=PaddingValues(bottom=24.dp)){
-   items(materialResults,key={it.name},contentType={"material_search"}){item->
+   items(materialResults,key={index,item->"${item.name}_${item.en}_${index}"},contentType={"material_search"}){item->
     Row(Modifier.fillMaxWidth().clickable{selectedMaterials=if(item.name in selectedMaterials)selectedMaterials-item.name else selectedMaterials+item.name}.padding(vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){
      Checkbox(checked=item.name in selectedMaterials,onCheckedChange={checked->selectedMaterials=if(checked)selectedMaterials+item.name else selectedMaterials-item.name})
      Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
