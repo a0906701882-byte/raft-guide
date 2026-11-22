@@ -482,7 +482,7 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
    }
    details
   } catch(_:Exception){ emptyList<String>() }
-  val combined=if(extracts.isNotEmpty()) extracts.take(3).joinToString("\\n\\n") else {
+  val combined=if(extracts.isNotEmpty()) extracts.take(3).joinToString("\n\n") else {
    (0 until minOf(results.length(),3)).mapNotNull{i->
     val snippet=results.getJSONObject(i).optString("snippet")
      .replace(Regex("<[^>]*>")," ")
@@ -490,10 +490,10 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
      .replace("&lt;","<").replace("&gt;",">").replace("&nbsp;"," ")
      .replace(Regex("\\s+")," ").trim()
     if(snippet.isBlank()) null else snippet
-   }.joinToString("\\n\\n")
+   }.joinToString("\n\n")
   }
   if(combined.isBlank()) "已連線，但這個問題暫時沒有取得可用的文字內容。請換個關鍵字再試一次。"
-  else "線上補充資料：\\n\\n"+combined
+  else "線上補充資料：\n\n"+combined
  } catch(_:Exception) {
   "目前無法連線取得線上資料，請確認網路後再試。App 內建百科仍可提供已收錄的答案。"
  }
@@ -583,7 +583,7 @@ fun GuideApp(){
      scope.launch{
       val local=answerRaftQuestion(q)
       val online=searchRaftOnline(q)
-      aiAnswer=local+"\\n\\n"+online
+      aiAnswer=local+"\n\n"+online
       aiSearching=false
      }
     }
