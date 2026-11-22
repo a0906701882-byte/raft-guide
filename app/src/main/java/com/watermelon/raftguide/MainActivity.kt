@@ -5,6 +5,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import org.json.JSONObject
+import org.json.JSONArray
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -440,7 +441,7 @@ private fun answerRaftQuestion(question:String):String{
   val found=data.filter{item->tokens.any{t->item.name.contains(t,true)||item.en.contains(t,true)||item.use.contains(t,true)||item.get.contains(t,true)}}.take(6)
   found.forEach{add(it.name,"分類：${it.cat}\n用途：${it.use}\n取得：${it.get}")}
  }
- if(out.isEmpty()) return "我目前在離線資料庫中找不到足夠可靠的答案：「$q」。你可以試著換成物品名稱、材料、設備、料理、動物、藍圖或故事地點等關鍵字。這個助手會優先列出資料庫有根據的內容，不會把猜測當成遊戲事實。若要回答資料庫以外的最新或複雜問題，仍需要連線式 AI 服務。"
+ if(out.isEmpty()) return "目前內建的 Raft 資料庫找不到足夠可靠的答案：「$q」。請試著使用物品、材料、設備、料理、動物、藍圖或故事地點等關鍵字；我會只整理有資料支持的內容，不把猜測當成事實。"
  return "根據 App 目前整理的 Raft 知識庫：\n\n"+out.distinct().take(14).joinToString("\n\n")+"\n\n提醒：若遊戲版本或存檔內容不同，請以遊戲內資訊為準。"
 }
 
@@ -451,7 +452,7 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
    connection.requestMethod="GET"
    connection.connectTimeout=10000
    connection.readTimeout=12000
-   connection.setRequestProperty("User-Agent","RAFT-Guide-Android/1.0")
+   connection.setRequestProperty("User-Agent","RAFT-Guide-Android/1.1")
    return try { connection.inputStream.bufferedReader().use{it.readText()} }
    finally { connection.disconnect() }
   }
@@ -459,7 +460,7 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
   val searchUrl="https://raft.fandom.com/api.php?action=query&list=search&srsearch=$encoded&format=json&utf8=1&srlimit=5"
   val searchJson=JSONObject(get(searchUrl))
   val results=searchJson.optJSONObject("query")?.optJSONArray("search")
-  if(results==null||results.length()==0) return@withContext "目前無法從線上百科找到相關內容。你仍可參考 App 內建資料。"
+  if(results==null||results.length()==0) return@withContext "線上 Raft 百科目前沒有找到相關資料。你可以換個更具體的物品或地點名稱再試一次。"
   val pageIds=mutableListOf<String>()
   val titles=mutableListOf<String>()
   for(i in 0 until minOf(results.length(),4)){
@@ -477,12 +478,12 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
     while(keys.hasNext()){
      val page=pages.getJSONObject(keys.next())
      val extract=page.optString("extract").trim()
-     if(extract.isNotBlank()) details.add(extract.take(650))
+     if(extract.isNotBlank()) details.add(extract.take(500))
     }
    }
    details
   } catch(_:Exception){ emptyList<String>() }
-  val combined=if(extracts.isNotEmpty()) extracts.take(3).joinToString("\n\n") else {
+  val sourceText=if(extracts.isNotEmpty()) extracts.take(3).joinToString("\n\n") else {
    (0 until minOf(results.length(),3)).mapNotNull{i->
     val snippet=results.getJSONObject(i).optString("snippet")
      .replace(Regex("<[^>]*>")," ")
@@ -492,10 +493,24 @@ private suspend fun searchRaftOnline(question:String):String = withContext(Dispa
     if(snippet.isBlank()) null else snippet
    }.joinToString("\n\n")
   }
-  if(combined.isBlank()) "已連線，但這個問題暫時沒有取得可用的文字內容。請換個關鍵字再試一次。"
-  else "線上補充資料：\n\n"+combined
+  if(sourceText.isBlank()) return@withContext "已找到相關百科頁面，但目前沒有可整理的文字內容。請換個關鍵字再試一次。"
+  try {
+   val translateUrl="https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-TW&dt=t&q="+URLEncoder.encode(sourceText.take(1800),"UTF-8")
+   val translated=JSONArray(get(translateUrl))
+   val segments=translated.optJSONArray(0)
+   val chinese=buildString {
+    if(segments!=null) for(i in 0 until segments.length()){
+     val segment=segments.optJSONArray(i)
+     if(segment!=null) append(segment.optString(0))
+    }
+   }.trim()
+   if(chinese.isBlank()) "已搜尋到相關資料，但翻譯服務暫時沒有回傳內容。請稍後再試。" 
+   else "已搜尋 Raft 線上百科，整理後的繁體中文資料：\n\n"+chinese+"\n\n提醒：線上百科內容可能因遊戲版本而不同，請以遊戲內資訊為準。"
+  } catch(_:Exception) {
+   "已找到 Raft 相關資料，但目前翻譯服務無法使用。為避免顯示未翻譯的英文原文，這次先不顯示搜尋片段，請稍後再試。"
+  }
  } catch(_:Exception) {
-  "目前無法連線取得線上資料，請確認網路後再試。App 內建百科仍可提供已收錄的答案。"
+  "目前無法連線搜尋 Raft 線上百科，請確認網路後再試。你仍可參考 App 內建的繁體中文資料。"
  }
 }
 
@@ -508,7 +523,7 @@ fun GuideApp(){
  var debouncedQuery by remember{mutableStateOf("")}
  LaunchedEffect(query){delay(180);debouncedQuery=query}
  var aiQuestion by remember{mutableStateOf("")}
- var aiAnswer by remember{mutableStateOf("你好！我是 RAFT 智慧助手。輸入問題後，我會整理 App 百科並嘗試連線補充相關資料。")}
+ var aiAnswer by remember{mutableStateOf("你好！輸入 Raft 問題後，我會先查詢 App 內建資料，再搜尋相關遊戲百科並整理成繁體中文。")}
  var aiSearching by remember{mutableStateOf(false)}
  val scope=rememberCoroutineScope()
  var category by remember{mutableStateOf("全部")}
@@ -571,8 +586,8 @@ fun GuideApp(){
  }else if(page=="AI問答"){
   Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)){
    Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
-    Text("📚 RAFT 智慧問答",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-    Text("輸入問題後，直接在這裡查看整理好的答案。",style=MaterialTheme.typography.bodyMedium)
+    Text("📚 RAFT 遊戲問答",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+    Text("自動搜尋 Raft 相關資料，整理成繁體中文直接回答；不使用 Gemini，也不顯示英文搜尋片段。",style=MaterialTheme.typography.bodyMedium)
    }}
    OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 問題")},placeholder={Text("例如：大型島嶼有哪些資源？")},minLines=2)
    Button(onClick={
@@ -588,10 +603,10 @@ fun GuideApp(){
      }
     }
    },enabled=aiQuestion.isNotBlank()&&!aiSearching,modifier=Modifier.fillMaxWidth()){
-    Text(if(aiSearching)"正在整理答案…" else "送出問題")
+    Text(if(aiSearching)"正在搜尋…" else "送出問題")
    }
    Card(Modifier.weight(1f,true).fillMaxWidth()){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-    Text(if(aiSearching)"正在查找並整理答案" else "回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+    Text(if(aiSearching)"正在搜尋並翻譯整理" else "回答",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
     Text(aiAnswer)
    }}
   }
