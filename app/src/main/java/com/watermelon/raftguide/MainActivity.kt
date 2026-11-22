@@ -451,12 +451,19 @@ fun GuideApp(){
  var selectedBlueprint by remember{mutableStateOf<Pair<String,String>?>(null)}
  var selectedIsland by remember{mutableStateOf<Pair<String,String>?>(null)}
  var favorites by remember{mutableStateOf(setOf<String>())}
+ var materialSearch by remember{mutableStateOf("")}
+ var selectedMaterials by remember{mutableStateOf(setOf<String>())}
+ var calculatorName by remember{mutableStateOf("")}
+ var materialName by remember{mutableStateOf("")}
+ var amountPerBuild by remember{mutableStateOf("1")}
+ var buildCount by remember{mutableStateOf("1")}
+ var researchSearch by remember{mutableStateOf("")}
  val categories=remember{listOf("全部")+data.map{it.cat}.distinct()}
  val filtered=remember(mode,category,debouncedQuery){data.filter{(debouncedQuery.isNotBlank()||mode=="創造模式"||(it.cat!="創造模式雜項"&&!it.creativeOnly))&&(category=="全部"||it.cat==category)&&(debouncedQuery.isBlank()||it.name.contains(debouncedQuery,true)||it.en.contains(debouncedQuery,true)||it.use.contains(debouncedQuery,true))}}
  val favoriteItems=remember(favorites,query){data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
- bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
+ bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼","研究指南","建造計算","材料清單").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";"研究指南"->"🔬";"建造計算"->"🧮";"材料清單"->"☑️";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -552,6 +559,58 @@ fun GuideApp(){
     Text("藍圖解鎖的是對應製作項目；材料研究仍然必要。解鎖後可在製作選單查看實際所需材料。")
     Text("目前未逐張核實所有藍圖的精確拾取位置，因此不提供未確認座標。",style=MaterialTheme.typography.bodySmall)
    }}
+  }
+ }
+
+ }else if(page=="研究指南"){
+ val researchEntries=blueprintInfo.filter{researchSearch.isBlank()||it.first.contains(researchSearch,true)||it.second.contains(researchSearch,true)}+
+  listOf("研究桌基本使用" to "取得新材料後，將材料放入研究桌研究；完成後查看解鎖清單。研究材料不代表會自動取得成品。","解鎖流程" to "先取得材料，再於研究桌完成研究，最後到製作選單確認已解鎖項目與所需材料。","藍圖與研究" to "藍圖拾取後會自動記錄；部分設備仍需要研究相關材料才能製作。").filter{researchSearch.isBlank()||it.first.contains(researchSearch,true)||it.second.contains(researchSearch,true)}
+ OutlinedTextField(value=researchSearch,onValueChange={researchSearch=it},modifier=Modifier.fillMaxWidth(),label={Text("搜尋研究項目或藍圖")},singleLine=true)
+ LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
+  items(researchEntries.distinctBy{it.first},key={it.first},contentType={"research"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text(entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
+ }
+ }else if(page=="建造計算"){
+ Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
+  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
+   Text("🧮 木筏建造材料計算器",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+   Text("輸入單件建造所需材料數量與建造件數，即可計算總需求。每種材料可分別計算。")
+   OutlinedTextField(value=calculatorName,onValueChange={calculatorName=it},modifier=Modifier.fillMaxWidth(),label={Text("建造項目名稱")},singleLine=true)
+   OutlinedTextField(value=materialName,onValueChange={materialName=it},modifier=Modifier.fillMaxWidth(),label={Text("材料名稱")},singleLine=true)
+   OutlinedTextField(value=amountPerBuild,onValueChange={amountPerBuild=it.filter{ch->ch.isDigit()}},modifier=Modifier.fillMaxWidth(),label={Text("每件需要多少材料")},singleLine=true)
+   OutlinedTextField(value=buildCount,onValueChange={buildCount=it.filter{ch->ch.isDigit()}},modifier=Modifier.fillMaxWidth(),label={Text("要建造幾件")},singleLine=true)
+   val total=(amountPerBuild.toIntOrNull()?:0)*(buildCount.toIntOrNull()?:0)
+   HorizontalDivider()
+   Text("計算結果",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+   Text("${calculatorName.ifBlank{"建造項目"}}：${materialName.ifBlank{"材料"}} 共需要 $total 個",style=MaterialTheme.typography.titleMedium)
+   Text("請依遊戲內配方填入單件材料數量，避免不同配方造成誤算。",style=MaterialTheme.typography.bodySmall)
+  }}
+ }
+ }else if(page=="材料清單"){
+ val materialResults=data.filter{it.name.contains(materialSearch,true)||it.en.contains(materialSearch,true)}.take(30)
+ Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(8.dp)){
+  Text("☑️ 建立自己的材料清單",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+  Text("搜尋材料後加入清單，收集完成即可勾選。")
+  OutlinedTextField(value=materialSearch,onValueChange={materialSearch=it},modifier=Modifier.fillMaxWidth(),label={Text("搜尋要收集的材料")},singleLine=true)
+  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
+   Text("已加入 ${selectedMaterials.size} 項",modifier=Modifier.weight(1f),color=MaterialTheme.colorScheme.primary)
+   TextButton(onClick={selectedMaterials=emptySet()}){Text("清空清單")}
+  }
+  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp),contentPadding=PaddingValues(bottom=24.dp)){
+   items(materialResults,key={it.name},contentType={"material_search"}){item->
+    Row(Modifier.fillMaxWidth().clickable{selectedMaterials=if(item.name in selectedMaterials)selectedMaterials-item.name else selectedMaterials+item.name}.padding(vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     Checkbox(checked=item.name in selectedMaterials,onCheckedChange={checked->selectedMaterials=if(checked)selectedMaterials+item.name else selectedMaterials-item.name})
+     Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
+     TextButton(onClick={selectedMaterials=if(item.name in selectedMaterials)selectedMaterials-item.name else selectedMaterials+item.name}){Text(if(item.name in selectedMaterials)"已加入" else "加入")}
+    }
+   }
+   item{HorizontalDivider();Text("我的材料清單",style=MaterialTheme.typography.titleMedium,fontWeight=FontWeight.Bold)}
+   items(selectedMaterials.toList().sorted(),key={it},contentType={"selected_material"}){name->
+    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){
+     Checkbox(checked=true,onCheckedChange={selectedMaterials=selectedMaterials-name})
+     Text(name,modifier=Modifier.weight(1f).padding(top=12.dp))
+     TextButton(onClick={selectedMaterials=selectedMaterials-name}){Text("移除")}
+    }
+   }
   }
  }
  }else if(page=="新手指南"){
