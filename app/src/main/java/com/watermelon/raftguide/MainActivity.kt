@@ -1,6 +1,8 @@
 package com.watermelon.raftguide
 
 import android.os.Bundle
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -440,6 +442,7 @@ private fun answerRaftQuestion(question:String):String{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuideApp(){
+  val context=LocalContext.current
  var mode by remember{mutableStateOf("一般模式")}
  var page by remember{mutableStateOf("物品百科")}
  var query by remember{mutableStateOf("")}
@@ -464,7 +467,7 @@ fun GuideApp(){
  val favoriteItems=remember(favorites,query){data.filter{it.name in favorites&&(query.isBlank()||it.name.contains(query,true)||it.en.contains(query,true))}}
  MaterialTheme(colorScheme=darkColorScheme(primary=Color(0xFF54D69A),secondary=Color(0xFF82C9B0),surface=Color(0xFF1B2925),background=Color(0xFF101A18))){
  Scaffold(topBar={TopAppBar(title={Text("RAFT 指南",fontWeight=FontWeight.Black)})},
- bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼","研究指南","建造計算","材料清單").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";"研究指南"->"🔬";"建造計算"->"🧮";"材料清單"->"☑️";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
+ bottomBar={Surface(modifier=Modifier.navigationBarsPadding(),color=MaterialTheme.colorScheme.surface,shadowElevation=6.dp){Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=8.dp, vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf("物品百科","收藏","AI問答","料理","動物","藍圖","新手指南","島嶼").forEach{p->Column(Modifier.width(76.dp).clickable{page=p;chosen=null}.padding(vertical=5.dp),horizontalAlignment=androidx.compose.ui.Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)){Text(when(p){"物品百科"->"📚";"收藏"->"⭐";"AI問答"->"🤖";"料理"->"🍲";"動物"->"🐾";"藍圖"->"📜";"新手指南"->"🛟";else->"🏝️"},style=MaterialTheme.typography.titleMedium);Text(p,style=MaterialTheme.typography.labelSmall,color=if(page==p)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,maxLines=1)}}}}}){
  pad->Column(Modifier.fillMaxSize().padding(pad).padding(horizontal=14.dp)){
  Text("木筏求生・繁體中文離線指南",style=MaterialTheme.typography.titleMedium)
  if(page=="物品百科"||page=="收藏"){
@@ -505,25 +508,27 @@ fun GuideApp(){
  }
  }
  }else if(page=="AI問答"){
- Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)){
-  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
-   Text("📚 RAFT 離線智慧助手",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-   Text("完全使用 APK 內建知識庫，不連接網路、不使用 Gemini、不需要 API 金鑰。",style=MaterialTheme.typography.bodyMedium)
-   Text("可查詢物品、材料、設備、配方、料理、動物、研究、島嶼、故事探索與生存技巧。",style=MaterialTheme.typography.bodySmall)
-  }}
-  OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 問題")},placeholder={Text("例如：前期如何穩定取得淡水？")},minLines=2)
-  Button(onClick={
-   val q=aiQuestion.trim()
-   if(q.isNotBlank()){aiAnswer=answerRaftQuestion(q);aiQuestion=""}
-  },enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("搜尋離線資料")}
-  Card(Modifier.weight(1f,true).fillMaxWidth()){
-   Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
-    Text("搜尋結果與攻略",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
-    Text(aiAnswer)
+  Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)){
+   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+    Text("📚 RAFT 智慧問答",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
+    Text("先搜尋 App 內的物品百科、料理、動物、藍圖與島嶼資料；也可連線開啟外部遊戲資料來源查找最新內容。",style=MaterialTheme.typography.bodyMedium)
+    Text("外部資料由瀏覽器開啟，需網路連線；不會假裝已讀取未開啟的網頁。",style=MaterialTheme.typography.bodySmall)
+   }}
+   OutlinedTextField(value=aiQuestion,onValueChange={aiQuestion=it},modifier=Modifier.fillMaxWidth(),label={Text("輸入 Raft 問題")},placeholder={Text("例如：大型島嶼有哪些資源？")},minLines=2)
+   Button(onClick={val q=aiQuestion.trim();if(q.isNotBlank()){aiAnswer=answerRaftQuestion(q);aiQuestion=""}},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("搜尋 App 百科資料")}
+   OutlinedButton(onClick={val q=aiQuestion.trim();if(q.isNotBlank()){val url="https://www.google.com/search?q="+Uri.encode("Raft game $q site:raft.fandom.com OR site:steamcommunity.com OR site:reddit.com/r/RaftTheGame");context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))}},enabled=aiQuestion.isNotBlank(),modifier=Modifier.fillMaxWidth()){Text("連線搜尋各大 Raft 資訊平台")}
+   Text("常用資訊來源",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
+   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
+    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://raft.fandom.com/wiki/Raft_Wiki")))},modifier=Modifier.weight(1f)){Text("RAFT 百科")}
+    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://steamcommunity.com/app/648800/guides/")))},modifier=Modifier.weight(1f)){Text("Steam 攻略")}
    }
+   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){
+    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://www.reddit.com/r/RaftTheGame/")))},modifier=Modifier.weight(1f)){Text("玩家社群")}
+    OutlinedButton(onClick={context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://www.redbeetinteractive.com/")))},modifier=Modifier.weight(1f)){Text("開發團隊")}
+   }
+   Card(Modifier.weight(1f,true).fillMaxWidth()){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(15.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){Text("App 百科搜尋結果",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary);Text(aiAnswer)}}
   }
-  Text("資料完全儲存在手機內；沒有收錄的內容會明確提示，不會假裝知道。",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
- }
+ }else if(page=="料理"){
  }else if(page=="料理"){
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
  items(recipeInfo,contentType={"recipe"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text("🍲 "+entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
@@ -563,29 +568,6 @@ fun GuideApp(){
   }
  }
 
- }else if(page=="研究指南"){
- val researchEntries=blueprintInfo.filter{researchSearch.isBlank()||it.first.contains(researchSearch,true)||it.second.contains(researchSearch,true)}+
-  listOf("研究桌基本使用" to "取得新材料後，將材料放入研究桌研究；完成後查看解鎖清單。研究材料不代表會自動取得成品。","解鎖流程" to "先取得材料，再於研究桌完成研究，最後到製作選單確認已解鎖項目與所需材料。","藍圖與研究" to "藍圖拾取後會自動記錄；部分設備仍需要研究相關材料才能製作。").filter{researchSearch.isBlank()||it.first.contains(researchSearch,true)||it.second.contains(researchSearch,true)}
- OutlinedTextField(value=researchSearch,onValueChange={researchSearch=it},modifier=Modifier.fillMaxWidth(),label={Text("搜尋研究項目或藍圖")},singleLine=true)
- LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
-  itemsIndexed(researchEntries.distinctBy{it.first},key={index,_->"research_$index"},contentType={_,_->"research"}){_,entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text(entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
- }
- }else if(page=="建造計算"){
- Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
-  Card(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
-   Text("🧮 木筏建造材料計算器",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-   Text("輸入單件建造所需材料數量與建造件數，即可計算總需求。每種材料可分別計算。")
-   OutlinedTextField(value=calculatorName,onValueChange={calculatorName=it},modifier=Modifier.fillMaxWidth(),label={Text("建造項目名稱")},singleLine=true)
-   OutlinedTextField(value=materialName,onValueChange={materialName=it},modifier=Modifier.fillMaxWidth(),label={Text("材料名稱")},singleLine=true)
-   OutlinedTextField(value=amountPerBuild,onValueChange={amountPerBuild=it.filter{ch->ch.isDigit()}},modifier=Modifier.fillMaxWidth(),label={Text("每件需要多少材料")},singleLine=true)
-   OutlinedTextField(value=buildCount,onValueChange={buildCount=it.filter{ch->ch.isDigit()}},modifier=Modifier.fillMaxWidth(),label={Text("要建造幾件")},singleLine=true)
-   val total=(amountPerBuild.toIntOrNull()?:0)*(buildCount.toIntOrNull()?:0)
-   HorizontalDivider()
-   Text("計算結果",fontWeight=FontWeight.Bold,color=MaterialTheme.colorScheme.primary)
-   Text("${calculatorName.ifBlank{"建造項目"}}：${materialName.ifBlank{"材料"}} 共需要 $total 個",style=MaterialTheme.typography.titleMedium)
-   Text("請依遊戲內配方填入單件材料數量，避免不同配方造成誤算。",style=MaterialTheme.typography.bodySmall)
-  }}
- }
  }else if(page=="材料清單"){
  val materialResults=data.filter{it.name.contains(materialSearch,true)||it.en.contains(materialSearch,true)}.take(30)
  Column(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(8.dp)){
