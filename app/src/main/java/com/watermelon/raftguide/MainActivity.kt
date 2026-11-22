@@ -478,7 +478,7 @@ fun GuideApp(){
   Text("目前顯示 ${list.size} 項",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.primary)
 
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=32.dp)){
- items(list,key={index,item->"${item.name}_${item.en}_${index}"},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
+ items(list,key={index->"raft_item_$index"},contentType={"raft_item"}){item->Card(Modifier.fillMaxWidth().clickable{chosen=item}){
  Row(Modifier.padding(13.dp),horizontalArrangement=Arrangement.spacedBy(12.dp)){
  Text(item.icon,style=MaterialTheme.typography.headlineMedium)
  Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
@@ -534,7 +534,7 @@ fun GuideApp(){
  }else if(page=="藍圖"){
  if(selectedBlueprint==null){
   LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
-   items(blueprintInfo,key={it.first},contentType={"blueprint"}){entry->
+   items(blueprintInfo,key={index->"blueprint_$index"},contentType={"blueprint"}){entry->
     Card(Modifier.fillMaxWidth().clickable{selectedBlueprint=entry}){
      Row(Modifier.padding(15.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)){
       Text("📜",style=MaterialTheme.typography.titleLarge)
@@ -567,7 +567,7 @@ fun GuideApp(){
   listOf("研究桌基本使用" to "取得新材料後，將材料放入研究桌研究；完成後查看解鎖清單。研究材料不代表會自動取得成品。","解鎖流程" to "先取得材料，再於研究桌完成研究，最後到製作選單確認已解鎖項目與所需材料。","藍圖與研究" to "藍圖拾取後會自動記錄；部分設備仍需要研究相關材料才能製作。").filter{researchSearch.isBlank()||it.first.contains(researchSearch,true)||it.second.contains(researchSearch,true)}
  OutlinedTextField(value=researchSearch,onValueChange={researchSearch=it},modifier=Modifier.fillMaxWidth(),label={Text("搜尋研究項目或藍圖")},singleLine=true)
  LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
-  items(researchEntries.distinctBy{it.first},key={it.first},contentType={"research"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text(entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
+  items(researchEntries.distinctBy{it.first},key={index->"research_$index"},contentType={"research"}){entry->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(15.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){Text(entry.first,fontWeight=FontWeight.Bold);Text(entry.second)}}}
  }
  }else if(page=="建造計算"){
  Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
@@ -596,7 +596,7 @@ fun GuideApp(){
    TextButton(onClick={selectedMaterials=emptySet()}){Text("清空清單")}
   }
   LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp),contentPadding=PaddingValues(bottom=24.dp)){
-   items(materialResults,key={index,item->"${item.name}_${item.en}_${index}"},contentType={"material_search"}){item->
+   items(materialResults,key={index->"material_$index"},contentType={"material_search"}){item->
     Row(Modifier.fillMaxWidth().clickable{selectedMaterials=if(item.name in selectedMaterials)selectedMaterials-item.name else selectedMaterials+item.name}.padding(vertical=5.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){
      Checkbox(checked=item.name in selectedMaterials,onCheckedChange={checked->selectedMaterials=if(checked)selectedMaterials+item.name else selectedMaterials-item.name})
      Column(Modifier.weight(1f)){Text(item.name,fontWeight=FontWeight.Bold);Text(item.cat,style=MaterialTheme.typography.bodySmall)}
@@ -619,7 +619,7 @@ fun GuideApp(){
  }else{
  if(selectedIsland==null){
   LazyColumn(Modifier.weight(1f).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(9.dp),contentPadding=PaddingValues(bottom=28.dp)){
-   items(islands,key={it.first},contentType={"island"}){island->
+   items(islands,key={index->"island_$index"},contentType={"island"}){island->
     Card(Modifier.fillMaxWidth().clickable{selectedIsland=island}){
      Row(Modifier.padding(15.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)){
       Text("🏝️",style=MaterialTheme.typography.titleLarge)
